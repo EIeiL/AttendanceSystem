@@ -50,23 +50,10 @@ export default {
         return false;
       },
     },
-    msgOptions: {
-      type:Array,
-      required:true,
-      default() {
-        return []
-      }
-    },
-    attendenceRecord: {
-      // 表单数据
-      type: Object,
-      default() {
-        return { name: "", date: "" };
-      },
-    },
   },
   data() {
     return {
+      attendenceRecord: { name: "", date: "" },
       rules: {
         // 校验规则
         name: [
@@ -118,11 +105,11 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           // alert("submit!");
-          console.log('this.attendenceRecord',this.attendenceRecord);
-          console.log('formName',formName);
-          this.$emit('onModal',this.attendenceRecord)
-          this.$emit('onDialogVisible',this.dialogVisible)
-          this.resetForm(formName);
+          console.log("this.attendenceRecord", this.attendenceRecord);
+          // console.log('formName',formName);
+          this.$emit("onModal", this.attendenceRecord);
+          this.$emit("onDialogVisible", false);
+          // this.resetForm(formName);
         } else {
           console.log("error submit!!");
           return false;
@@ -135,7 +122,7 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields();
       // this.dialogVisible = false;
-      this.$emit('onDialogVisible',false)
+      this.$emit("onDialogVisible", false);
     },
   },
 };
