@@ -83,13 +83,15 @@
        * @description 编辑某行数据
        */
       onEdit(row) {
-        console.log(row);
+        // console.log(row)
+        this.$emit('onTableEdit', row)
       },
       /**
        * @description 删除某行数据
        */
       onDelete(row) {
-        console.log(row);
+        // console.log(row)
+        this.$emit('onTableDel', row)
       },
       /**
        * @description 选择每页多少条

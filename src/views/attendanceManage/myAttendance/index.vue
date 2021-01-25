@@ -17,9 +17,11 @@
       :search-param="searchParam"
       :count="count"
     />
-    <myAttendance-modal
-      :dialogVisible="dialogVisible"
-      @onDialogVisible="onDialogVisible"
+    <!-- 模态框 -->
+    <add-modal
+      :dialogVisible.sync="dialogVisible"
+      :msgOptions="msgOptions"
+      :modalTitle="modalTitle"
       @onModal="onModal"
     />
   </div>
@@ -30,7 +32,7 @@
 import Current from "@/components/NowLocation/index";
 import AttendanceForm from "@/components/QueryForm/index";
 import AttendanceTable from "@/components/DataTable/index";
-import MyAttendanceModal from "./components/ModalBox";
+import AddModal from "@/components/ModalBox/addModal/index";
 
 // js文件 -- 传入组件内容
 import { myAttendance } from "@/enum/attendance";
@@ -41,7 +43,9 @@ const msgOptions = [
     prop: "name",
     element: "el-select",
     placeholder: "请选择用户姓名",
-
+    rules: [
+      { required: true, message: "请输入用户姓名", trigger: "blur" },
+    ],
     options: [
       {
         label: "张三",
@@ -56,22 +60,35 @@ const msgOptions = [
   {
     label: "考勤时间",
     prop: "time",
-    element: "el-date-picker"
+    element: "el-time-select",
+    rules: [
+      { required: true, message: "请选择考勤时间", trigger: "blur" },
+    ],
+  }, {
+    label: "",
+    prop: "text",
+    element: "el-text",
+    placeholder: "注:本次的打卡时间不得早于之前的打卡时间",
+    class: "tipText"
   }
 ];
+
 export default {
   components: {
     Current, // 当前位置
     AttendanceForm, // 表单
     AttendanceTable, // 表格+分页
-    MyAttendanceModal,
+    AddModal
   },
-  data() {
+  data () {
     return {
-      dialogVisible: false,
+      modalTitle: "",
+      msgOptions: msgOptions,
+      dialogVisible: false, // 模态框是否显示
       formOptions: myAttendance.formOptions, // 表单属性
       btnTools: myAttendance.btnTools, // 工具按钮属性
       columnOptions: myAttendance.columnOptions, // 列属性
+
       tableData: [
         {
           date: "2016-05-02",
@@ -107,7 +124,7 @@ export default {
     /**
      * @description 触发搜索
      */
-    onSearch(val) {
+    onSearch (val) {
       this.searchParam = val;
       // console.log(this.searchParam);
       // this.getAdvList()
@@ -115,19 +132,27 @@ export default {
     /**
      * @description 工具按钮返回内容
      */
-    toolsBtn(val) {
-      console.log(val);
+    toolsBtn (val) {
+      console.log('val', val);
+      this.modalTitle = "添加考勤记录"
       this.dialogVisible = true;
     },
-    onModal(val) {
+    onModal (val) {
       console.log(val);
-    },
-    onDialogVisible(val) {
-      this.dialogVisible = val;
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+>>> .tipText {
+  // 我的考勤
+  color: red;
+  // text-align: center;
+  margin-left: 120px;
+}
+>>> .el-dialog__body {
+  // 我的考勤
+  padding-bottom: 0px;
+}
 </style>

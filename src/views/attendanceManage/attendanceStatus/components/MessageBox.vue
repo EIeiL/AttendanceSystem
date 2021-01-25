@@ -12,6 +12,7 @@
           ref="ruleForm"
           label-width="100px"
           class="demo-ruleForm"
+          :before-close="resetForm('user')"
         >
           <el-form-item label="活动名称" prop="name">
             <el-input v-model="ruleForm.name"></el-input>

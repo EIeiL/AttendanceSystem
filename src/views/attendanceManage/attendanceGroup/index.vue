@@ -16,10 +16,11 @@
       :search-param="searchParam"
       :count="count"
     />
-    <attendanceGroup-modal
-      :dialogVisible="dialogVisible"
+    <!-- 模态框 -->
+    <myAttendance-modal
+      :dialogVisible.sync="dialogVisible"
+      :msgOptions="msgOptions"
       :modalTitle="modalTitle"
-      @onDialogVisible="onDialogVisible"
       @onModal="onModal"
     />
   </div>
@@ -30,21 +31,89 @@
 import Current from "@/components/NowLocation/index";
 import AttendanceForm from "@/components/QueryForm/index";
 import AttendanceTable from "@/components/DataTable/index";
-import AttendanceGroupModal from "./components/ModalBox";
+import MyAttendanceModal from "@/views/attendanceManage/myAttendance/components/ModalBox";
 
 // js文件 -- 传入组件内容
 import { attendanceGroup } from "@/enum/attendance";
+
+const msgOptions = [
+  {
+    label: "用户姓名",
+    prop: "name",
+    element: "el-select",
+    placeholder: "请选择用户姓名",
+    rules: [
+      { required: true, message: "请输入活动名称", trigger: "blur" },
+    ],
+    options: [
+      {
+        label: "张三",
+        value: "张三",
+      },
+      {
+        label: "李四",
+        value: "李四",
+      }
+    ],
+  },
+  {
+    label: "考勤类型",
+    prop: "type",
+    element: "el-radio-group",
+    rules: [
+      { required: true, message: "请选择考勤类型", trigger: "blur" },
+    ],
+    options: [
+      {
+        label: "张三张三张三张三张三张三张三张三",
+        value: "张三张三张三张三张三张三张三张三",
+      },
+      {
+        label: "李四张三张三张三张三张三张三张三",
+        value: "李四张三张三张三张三张三张三张三",
+      }
+    ],
+  },
+  {
+    label: "休息日选择",
+    prop: "day",
+    element: "el-checkbox-group",
+    rules: [
+      { required: true, message: "请选择休息日", trigger: "blur" },
+    ],
+    options: [
+      {
+        label: "张三",
+        value: "张三",
+      },
+      
+      {
+        label: "李四",
+        value: "李四",
+      }
+    ],
+  },
+  {
+    label: "考勤时间",
+    prop: "time",
+    element: "el-time-select",
+    rules: [
+      { required: true, message: "请输入活动名称", trigger: "blur" },
+    ],
+  }
+];
 
 export default {
   components: {
     Current, // 当前位置
     AttendanceForm, // 表单
     AttendanceTable, // 表格+分页
-    AttendanceGroupModal,
+    MyAttendanceModal
   },
   data() {
     return {
       dialogVisible: false,
+      msgOptions:msgOptions,
       modalTitle: "",
       formOptions: [], // 表单属性
       btnTools: attendanceGroup.btnTools, // 工具按钮属性
@@ -86,14 +155,11 @@ export default {
      */
     toolsBtn(val) {
       console.log(val);
-      this.modalTitle = "添加用户";
+      this.modalTitle = "添加考勤组";
       this.dialogVisible = true;
     },
     onModal(val) {
       console.log(val);
-    },
-    onDialogVisible(val) {
-      this.dialogVisible = val;
     },
   },
 };

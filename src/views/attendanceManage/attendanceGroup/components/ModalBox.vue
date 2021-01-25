@@ -9,6 +9,7 @@
           ref="group"
           label-width="120px"
           class="demo-group"
+          :before-close="resetForm('user')"
         >
           <el-form-item label="考勤组名称" prop="name">
             <el-input v-model="group.name"></el-input>
@@ -38,8 +39,9 @@
               <el-checkbox label="周一" name="type"></el-checkbox>
             </el-checkbox-group>
             
-          </el-form-item>
-        </el-form><el-calendar v-model="value"> </el-calendar>
+          </el-form-item><el-calendar v-model="value" class="attendance-calendar">
+             </el-calendar>
+        </el-form>
       </span>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm('group')">添 加</el-button>
@@ -122,5 +124,8 @@ export default {
   color: red;
   // text-align: center;
   margin-left: 120px;
+}
+.attendance-calendar{
+  border: 1px solid #eee;
 }
 </style>

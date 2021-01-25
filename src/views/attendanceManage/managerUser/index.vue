@@ -16,13 +16,18 @@
       :column-options="columnOptions"
       :search-param="searchParam"
       :count="count"
+      @onTableDel="onTableDel"
+      @onTableEdit="onTableEdit"
     />
-    <managerUser-modal
-      :dialogVisible="dialogVisible"
+    <!-- 模态框 -->
+    <add-modal
+      :dialogVisible.sync="dialogVisible"
+      :msgOptions="msgOptions"
       :modalTitle="modalTitle"
-      @onDialogVisible="onDialogVisible"
+      :rowData="rowData"
       @onModal="onModal"
     />
+    <import-modal :dialogVisible1.sync="dialogVisible1" @onModal1="onModal1" />
   </div>
 </template>
 
@@ -31,25 +36,51 @@
 import Current from "@/components/NowLocation/index";
 import AttendanceForm from "@/components/QueryForm/index";
 import AttendanceTable from "@/components/DataTable/index";
-import ManagerUserModal from "./components/ModalBox";
+import AddModal from "@/components/ModalBox/addModal/index";
+import ImportModal from "./components/ModalBox"
 
 // js文件 -- 传入组件内容
 import { managerUser } from "@/enum/attendance";
+
+const msgOptions = [
+  {
+    label: "用户姓名",
+    prop: "name",
+    element: "el-input",
+    placeholder: "请输入用户姓名",
+    rules: [
+      { required: true, message: "请输入活动名称", trigger: "blur" },
+    ]
+  }, {
+    label: "联系电话",
+    prop: "phone",
+    element: "el-input",
+    placeholder: "请输入联系电话",
+    rules: [
+      { required: true, message: "请输入联系电话", trigger: "blur" },
+    ]
+  }
+]
+
 
 export default {
   components: {
     Current, // 当前位置
     AttendanceForm, // 表单
     AttendanceTable, // 表格+分页
-    ManagerUserModal,
+    AddModal,
+    ImportModal
   },
-  data() {
+  data () {
     return {
       dialogVisible: false,
+      dialogVisible1: false,
+      msgOptions: msgOptions,
       modalTitle: "",
       formOptions: managerUser.formOptions, // 表单属性
       btnTools: managerUser.btnTools, // 工具按钮属性
       columnOptions: managerUser.columnOptions, // 列属性
+      rowData: {},
       tableData: [
         {
           date: "2016-05-02",
@@ -84,7 +115,7 @@ export default {
     /**
      * @description 触发搜索
      */
-    onSearch(val) {
+    onSearch (val) {
       this.searchParam = val;
       // console.log(this.searchParam);
       // this.getAdvList()
@@ -92,24 +123,37 @@ export default {
     /**
      * @description 工具按钮返回内容
      */
-    toolsBtn(val) {
+    toolsBtn (val) {
       console.log(val);
       if (val == "addUser") {
-        this.modalTitle= "添加用户"
+        this.modalTitle = "添加用户"
         this.dialogVisible = true;
-        
+
       } else {
-        this.modalTitle = "导入用户";
-        this.dialogVisible = true;
+        this.modalTitle = "导入用户"
+        this.dialogVisible1 = true;
       }
     },
-    onModal(val) {
+    onTableDel (val) {
+      console.log(val);
+      // this.searchParam = val;
+      // console.log(this.searchParam);
+      // this.getAdvList()
+    },
+    onTableEdit (val) {
+      console.log('编辑', val);
+      this.rowData = val
+      console.log(this.rowData);
+      this.modalTitle = "编辑用户"
+      this.dialogVisible = true;
+    },
+    onModal (val) {
       console.log(val);
     },
-    onDialogVisible(val) {
-      this.dialogVisible = val;
+    onModal1 (val) {
+      console.log(val);
     },
-  },
+  }
 };
 </script>
 
