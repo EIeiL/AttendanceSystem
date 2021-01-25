@@ -17,7 +17,7 @@
       :search-param="searchParam"
       :count="count"
     />
-    <myAttendance-modal
+    <attendanceStatus-modal
       :dialogVisible.sync="dialogVisible"
       :msgOptions="msgOptions"
       :modalTitle="modalTitle"
@@ -31,7 +31,8 @@
 import Current from '@/components/NowLocation/index'
 import AttendanceForm from '@/components/QueryForm/index'
 import AttendanceTable from '@/components/DataTable/index'
-import MyAttendanceModal from "@/views/attendanceManage/myAttendance/components/ModalBox";
+// import MyAttendanceModal from "@/views/attendanceManage/myAttendance/components/ModalBox";
+import AttendanceStatusModal from "./components/ModalBox";
 
 // js文件 -- 传入组件内容
 import {
@@ -112,7 +113,7 @@ export default {
     Current, // 当前位置
     AttendanceForm, // 表单
     AttendanceTable, // 表格+分页
-    MyAttendanceModal
+    AttendanceStatusModal
   },
   data () {
     return {

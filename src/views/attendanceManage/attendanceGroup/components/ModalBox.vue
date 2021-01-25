@@ -1,6 +1,11 @@
 <template>
   <div class="managerUser-modal">
-    <el-dialog :title="modalTitle" :visible.sync="dialogVisible" width="900px">
+    <el-dialog
+      :title="modalTitle"
+      :visible.sync="dialogVisible"
+      width="900px"
+      :before-close="resetForm"
+    >
       <span>
         <!-- 这是一段信息 -->
         <el-form
@@ -9,7 +14,6 @@
           ref="group"
           label-width="120px"
           class="demo-group"
-          :before-close="resetForm('user')"
         >
           <el-form-item label="考勤组名称" prop="name">
             <el-input v-model="group.name"></el-input>
@@ -21,7 +25,8 @@
             <el-radio-group v-model="group.name">
               <el-radio
                 label="固定班制（每天考勤时间一样，适用于固定上班时间制的员工）"
-              ></el-radio><div></div>
+              ></el-radio>
+              <div style="height:9px"></div>
               <el-radio label="大小周制（适用于大小周制的员工）"></el-radio>
             </el-radio-group>
           </el-form-item>
@@ -31,21 +36,22 @@
           <el-form-item label="休息日选择" prop="name">
             <el-checkbox-group v-model="group.name">
               <el-checkbox label="周一" name="type"></el-checkbox>
-              <el-checkbox label="周一" name="type"></el-checkbox>
-              <el-checkbox label="周一" name="type"></el-checkbox>
-              <el-checkbox label="周一" name="type"></el-checkbox>
-              <el-checkbox label="周一" name="type"></el-checkbox>
-              <el-checkbox label="周一" name="type"></el-checkbox>
-              <el-checkbox label="周一" name="type"></el-checkbox>
+              <el-checkbox label="周二" name="type"></el-checkbox>
+              <el-checkbox label="周三" name="type"></el-checkbox>
+              <el-checkbox label="周四" name="type"></el-checkbox>
+              <el-checkbox label="周五" name="type"></el-checkbox>
+              <el-checkbox label="周六" name="type"></el-checkbox>
+              <el-checkbox label="周日" name="type"></el-checkbox>
             </el-checkbox-group>
-            
-          </el-form-item><el-calendar v-model="value" class="attendance-calendar">
-             </el-calendar>
+          </el-form-item>
+          <el-calendar v-model="value" class="attendance-calendar">
+            </el-calendar
+          >
         </el-form>
       </span>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm('group')">添 加</el-button>
-        <el-button @click="resetForm('group')">取 消</el-button>
+        <el-button type="primary" @click="submitForm">添 加</el-button>
+        <el-button @click="resetForm">取 消</el-button>
       </span>
     </el-dialog>
   </div>
@@ -57,9 +63,7 @@ export default {
     dialogVisible: {
       // 控制模态框是否显示
       type: Boolean,
-      default() {
-        return false;
-      },
+      default: false,
     },
     modalTitle: {
       type: String,
@@ -89,14 +93,12 @@ export default {
     /**
      * @description 添加按钮触发事件
      */
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+    submitForm() {
+      this.$refs["group"].validate((valid) => {
         if (valid) {
-          // alert("submit!");
-          console.log("this.group", this.group);
-          // console.log('formName',formName);
+          // console.log("this.group", this.group);
           this.$emit("onModal", this.group);
-          this.$emit("onDialogVisible", false);
+          this.$emit("update:dialogVisible", false);
           // this.resetForm(formName);
         } else {
           console.log("error submit!!");
@@ -107,10 +109,10 @@ export default {
     /**
      * @description 取消/关闭按钮触发事件
      */
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
+    resetForm() {
+      this.$refs["group"].resetFields();
       // this.dialogVisible = false;
-      this.$emit("onDialogVisible", false);
+      this.$emit("update:dialogVisible", false);
     },
   },
 };
@@ -120,12 +122,7 @@ export default {
 >>> .el-input__inner {
   width: 300px;
 }
-.tipText {
-  color: red;
-  // text-align: center;
-  margin-left: 120px;
-}
-.attendance-calendar{
+.attendance-calendar {
   border: 1px solid #eee;
 }
 </style>
