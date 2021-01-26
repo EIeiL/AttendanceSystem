@@ -25,9 +25,7 @@
         </span>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm('formInline')"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="resetForm">取 消</el-button>
       </span>
     </el-dialog>
@@ -68,16 +66,13 @@ export default {
       formInline: {}
     };
   },
-  created () {
-    this.addInitValue()
-  },
-  watch:{
-    'rowData':{
-      handler(val){
-        console.log('val',val);
+  watch: {
+    'rowData': {
+      handler (val) {
+        console.log('val', val);
         this.formInline = val
       },
-      deep:true
+      deep: true
     }
   },
   // model:{
@@ -86,23 +81,11 @@ export default {
   // },  
   methods: {
     /**
-     * @description 添加初始值
-     */
-    addInitValue () {
-      const obj = {}
-      console.log('this.rowData',this.rowData);
-      // obj=this.rowData
-      console.log();
-      this.formInline = obj
-    },
-    /**
      * @description 添加按钮触发事件
      */
-    submitForm (formName) {
-      console.log('formInline', this.formInline);
-      console.log('rowData', rowData);
+    submitForm () {
       console.log('提交');
-      this.$refs[formName].validate((valid) => {
+      this.$refs['formInline'].validate((valid) => {
         if (valid) {
           console.log('校验成功！')
           this.$emit("onModal", this.formInline)

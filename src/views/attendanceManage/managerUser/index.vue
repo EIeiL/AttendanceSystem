@@ -27,7 +27,10 @@
       :rowData="rowData"
       @onModal="onModal"
     />
-    <import-modal :dialogVisible1.sync="dialogVisible1" @onModal1="onModal1" />
+    <importUser-modal
+      :dialogVisible1.sync="dialogVisible1"
+      @onModal1="onModal1"
+    />
   </div>
 </template>
 
@@ -37,10 +40,14 @@ import Current from "@/components/NowLocation/index";
 import AttendanceForm from "@/components/QueryForm/index";
 import AttendanceTable from "@/components/DataTable/index";
 import AddModal from "@/components/ModalBox/addModal/index";
-import ImportModal from "./components/ModalBox"
+
+import ImportUserModal from "./components/importUser"
 
 // js文件 -- 传入组件内容
 import { managerUser } from "@/enum/attendance";
+
+import deepCopy from "@/utils/deepCopy"
+import { openDel } from "@/utils/messageBox"
 
 const msgOptions = [
   {
@@ -69,7 +76,7 @@ export default {
     AttendanceForm, // 表单
     AttendanceTable, // 表格+分页
     AddModal,
-    ImportModal
+    ImportUserModal
   },
   data () {
     return {
@@ -112,6 +119,7 @@ export default {
     };
   },
   methods: {
+    openDel,
     /**
      * @description 触发搜索
      */
@@ -139,16 +147,28 @@ export default {
       // this.searchParam = val;
       // console.log(this.searchParam);
       // this.getAdvList()
+      this.openDel('是否确定删除该用户？')
     },
     onTableEdit (val) {
       console.log('编辑', val);
-      this.rowData = val
-      console.log(this.rowData);
+      // this.rowData = JSON.parse(val)
+      var o;
+      if (typeof val === 'object') {
+        o = deepCopy.copyObject(val);
+      } else {
+        o = val;
+      }
+      this.rowData = o
+      // console.log(this.rowData);
       this.modalTitle = "编辑用户"
       this.dialogVisible = true;
     },
     onModal (val) {
       console.log(val);
+      console.log('编辑之后', val);
+      if (this.modalTitle == "编辑用户") {
+        this.rowData = val
+      }
     },
     onModal1 (val) {
       console.log(val);

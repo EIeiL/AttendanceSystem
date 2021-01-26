@@ -1,5 +1,5 @@
 <template>
-  <div class="import-modal">
+  <div class="importUser-modal">
     <el-dialog
       title="导入用户"
       :visible.sync="dialogVisible1"

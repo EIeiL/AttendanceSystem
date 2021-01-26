@@ -2,9 +2,8 @@
   <div class="hello">
     <header-bar />
     <el-container>
-      <aside-nav />
       <el-main>
-        Hello,this is XieSiwei's practical training project!
+        <h3>Hello,this is XieSiwei's practical training project!</h3>
       </el-main>
     </el-container>
   </div>
@@ -12,12 +11,10 @@
 
 <script>
   import HeaderBar from '@/components/Layout/HeaderBar/index'
-  import AsideNav from '@/components/Layout/AsideNav/index'
   export default {
     name: 'HelloWorld',
     components: {
-      HeaderBar,
-      AsideNav
+      HeaderBar
     }
   }
 </script>
@@ -26,5 +23,9 @@
 <style scoped>
   .el-main{
     padding: 15px;
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 20vh;
+    font-size: 32px;
   }
 </style>

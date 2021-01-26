@@ -16,8 +16,11 @@
       :column-options="columnOptions"
       :search-param="searchParam"
       :count="count"
+      @onTableDel="onTableDel"
+      @onTableEdit="onTableEdit"
     />
-    <attendanceStatus-modal
+    <!-- 模态框 -->
+    <addStatus-modal
       :dialogVisible.sync="dialogVisible"
       :msgOptions="msgOptions"
       :modalTitle="modalTitle"
@@ -32,12 +35,13 @@ import Current from '@/components/NowLocation/index'
 import AttendanceForm from '@/components/QueryForm/index'
 import AttendanceTable from '@/components/DataTable/index'
 // import MyAttendanceModal from "@/views/attendanceManage/myAttendance/components/ModalBox";
-import AttendanceStatusModal from "./components/ModalBox";
+import AddStatusModal from "./components/addStatus";
 
 // js文件 -- 传入组件内容
-import {
-  attendanceStatus
-} from '@/enum/attendance'
+import { attendanceStatus } from '@/enum/attendance'
+
+import deepCopy from "@/utils/deepCopy"
+import { openDel } from "@/utils/messageBox"
 
 const msgOptions = [
   {
@@ -113,7 +117,7 @@ export default {
     Current, // 当前位置
     AttendanceForm, // 表单
     AttendanceTable, // 表格+分页
-    AttendanceStatusModal
+    AddStatusModal
   },
   data () {
     return {
@@ -148,6 +152,7 @@ export default {
     }
   },
   methods: {
+    openDel,
     /**
      * @description 触发搜索
      */
@@ -167,6 +172,30 @@ export default {
     },
     onModal (val) {
       console.log(val);
+    },
+    onTableDel (val) {
+      console.log('',val);
+      // this.searchParam = val;
+      // console.log(this.searchParam);
+      // this.getAdvList()
+      this.openDel('是否确定删除该考勤状态？')
+    },
+    /**
+     * @description 还没用
+     */
+    onTableEdit (val) {
+      console.log('编辑', val);
+      // this.rowData = JSON.parse(val)
+      var o;
+      if (typeof val === 'object') {
+        o = deepCopy.copyObject(val);
+      } else {
+        o = val;
+      }
+      this.rowData = o
+      // console.log(this.rowData);
+      this.modalTitle = "编辑考勤状态"
+      this.dialogVisible = true;
     },
   }
 }
