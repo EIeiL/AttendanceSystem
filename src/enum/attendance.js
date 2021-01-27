@@ -2,35 +2,16 @@ export const myAttendance = {
   formOptions: [
     {
       label: '状态名称',
-      prop: 'status',
+      prop: 'queryStatus',
       element: 'el-select',
       placeholder: '请选择考勤状态',
-
-      options: [{
-        label: '签到正常',
-        value: '签到正常'
-      }, {
-        label: '迟到',
-        value: '迟到'
-      }, {
-        label: '早退',
-        value: '早退'
-      }, {
-        label: '迟到转事假',
-        value: '迟到转事假'
-      }, {
-        label: '签退正常',
-        value: '签退正常'
-      }, {
-        label: '缺卡',
-        value: '缺卡'
-      }]
+      options: []
     }, {
       label: '考勤时间',
-      prop: 'time',
-      element: 'el-date-picker'
+      prop: 'queryTime',
+      element: 'el-date-picker1'
     }, {
-      prop: 'content',
+      prop: 'query',
       element: 'el-input',
       maxlength: 20,
       placeholder: '请输入需要搜索的内容'
@@ -44,22 +25,48 @@ export const myAttendance = {
   ],
   columnOptions: [
     {
-      prop: 'name',
+      prop: 'userName',
       label: '用户姓名',
       operate: '',
     }, {
-      prop: 'date',
+      prop: 'signTime',
       label: '考勤时间',
-      sortable: true,
       operate: '',
     }, {
-      prop: 'address',
+      prop: 'signInStatusName',
       label: '签到状态',
       operate: '',
     }, {
-      prop: 'address',
+      prop: 'signOutStatusName',
       label: '签退状态',
       operate: ''
+    }
+  ],
+  modalOptions: [
+    {
+      label: "用户姓名",
+      prop: "userId",
+      element: "el-select",
+      placeholder: "请选择用户姓名",
+      rules: [
+        { required: true, message: "请选择用户姓名", trigger: "blur" },
+      ],
+      options: [
+      ],
+    },
+    {
+      label: "考勤时间",
+      prop: "signTime",
+      element: "el-date-picker",
+      rules: [
+        { required: true, message: "请选择考勤时间", trigger: "blur" },
+      ],
+      value: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
+    }, {
+      label: "",
+      element: "el-text",
+      placeholder: "注:本次的打卡时间不得早于之前的打卡时间",
+      class: "tipText"
     }
   ]
 }
@@ -98,20 +105,20 @@ export const managerUser = {
   ],
   columnOptions: [
     {
-      prop: 'name',
+      prop: 'id',
       label: '序号',
       sortable: true,
       operate: '',
     }, {
-      prop: 'name',
+      prop: 'username',
       label: '用户姓名',
       operate: '',
     }, {
-      prop: 'address',
+      prop: 'telephone',
       label: '联系电话',
       operate: '',
     }, {
-      prop: 'date',
+      prop: 'createTime',
       label: '添加时间',
       sortable: true,
       operate: '',
@@ -155,19 +162,19 @@ export const attendanceStatus = {
   }],
   columnOptions: [
     {
-      prop: 'name',
+      prop: 'id',
       label: '序号',
       operate: '',
     }, {
-      prop: 'date',
+      prop: 'name',
       label: '状态名称',
       operate: '',
     }, {
-      prop: 'address',
+      prop: 'rule',
       label: '规则设置',
       operate: '',
     }, {
-      prop: 'date',
+      prop: 'createTime',
       label: '添加时间',
       sortable: true,
       operate: ''
@@ -189,21 +196,21 @@ export const attendanceGroup = {
       label: '考勤组名称',
       operate: '',
     }, {
-      prop: 'date',
+      prop: 'peopleSize',
       label: '考勤人数',
       sortable: true,
       operate: '',
     }, {
-      prop: 'name',
+      prop: 'type',
       label: '类型',
       operate: '',
     }, {
-      prop: 'date',
+      prop: 'attendanceTime',
       label: '考勤时间',
       sortable: true,
       operate: ''
     }, {
-      prop: 'address',
+      prop: 'status',
       label: '状态',
       operate: ''
     }, {

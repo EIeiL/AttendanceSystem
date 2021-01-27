@@ -41,13 +41,26 @@
       range-separator="至"
       start-placeholder="开始日期"
       end-placeholder="结束日期"
-      :picker-options="pickerOptions"
-      v-if="isDatePicker"
+      :picker-options="pickerOptions1"
+      v-if="isDaySelect"
       v-bind="bindProps"
       clearable
       format="yyyy-MM-dd"
       value-format="yyyy-MM-dd"
       v-on="bindEvents"
+    >
+    </el-date-picker>
+
+    <!-- 日期时间选择框 -->
+    <el-date-picker
+      v-model="currentVal"
+      type="datetime"
+      v-if="isDatePicker"
+      v-bind="bindProps"
+      clearable
+      v-on="bindEvents"
+      format="yyyy-MM-dd HH:mm:ss"
+      value-format="yyyy-MM-dd HH:mm:ss"
     >
     </el-date-picker>
 
@@ -98,6 +111,8 @@
 </template>
 
 <script>
+import picker from '@/utils/picker'
+
 export default {
   props: {
     value: {},
@@ -110,33 +125,7 @@ export default {
   },
   data () {
     return {
-      pickerOptions: {
-        shortcuts: [{
-          text: '最近一周',
-          onClick (picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近一个月',
-          onClick (picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近三个月',
-          onClick (picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-            picker.$emit('pick', [start, end]);
-          }
-        }]
-      },
+      pickerOptions1: picker.pickerOptions,
     }
   },
   computed: {
@@ -184,10 +173,16 @@ export default {
       return this.itemOptions.element === 'el-input'
     },
     /**
-     * @description el-date-picker 判断是否为日期选择器
+     * @description el-date-picker 判断是否为日期时间选择器
      */
     isDatePicker () {
       return this.itemOptions.element === 'el-date-picker'
+    },
+    /**
+     * @description el-date-picker 判断是否为日期选择器
+     */
+    isDaySelect () {
+      return this.itemOptions.element === 'el-date-picker1'
     },
     /**
      * @description el-select 判断是否为下拉框
@@ -220,9 +215,23 @@ export default {
       return this.itemOptions.element === 'el-text'
     },
   },
-  methods: {}
+  methods: {
+    // 未实现 限制时间日期选择器选择范围
+    pickerOptions (index) {
+      if (this.periodList[index].date) {
+        const date = this.periodList[index].date + '-01'
+        const startTime = moment(date).startOf('month').format('yyyy-MM-DD')
+        const endTime = moment(date).endOf('month').format('yyyy-MM-DD')
+        return {
+          disabledDate: time => {
+            const transTime = moment(time).format('yyyy-MM-DD')
+            return !moment(transTime).isBetween(moment(startTime).add(-4, 'days').format('yyyy-MM-DD'), moment(endTime).add(4, 'days').format('yyyy-MM-DD'))
+          }
+        }
+      }
+    },
+  }
 }
-
 </script>
 
 <style lang="scss" scoped>

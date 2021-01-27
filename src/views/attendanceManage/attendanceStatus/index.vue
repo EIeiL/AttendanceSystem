@@ -34,12 +34,12 @@
 import Current from '@/components/NowLocation/index'
 import AttendanceForm from '@/components/QueryForm/index'
 import AttendanceTable from '@/components/DataTable/index'
-// import MyAttendanceModal from "@/views/attendanceManage/myAttendance/components/ModalBox";
+
+// 业务组件 -- 添加状态模态框
 import AddStatusModal from "./components/addStatus";
 
-// js文件 -- 传入组件内容
+// js文件 -- 传入组件内容、深拷贝、弹框
 import { attendanceStatus } from '@/enum/attendance'
-
 import deepCopy from "@/utils/deepCopy"
 import { openDel } from "@/utils/messageBox"
 
@@ -110,40 +110,22 @@ const msgOptions = [
   }
 ];
 
-
 export default {
   components: {
-
     Current, // 当前位置
     AttendanceForm, // 表单
     AttendanceTable, // 表格+分页
-    AddStatusModal
+    AddStatusModal  // 添加状态模态框
   },
   data () {
     return {
-      dialogVisible: false,
-      msgOptions: msgOptions,
-      modalTitle: "",
+      dialogVisible: false, 
+      msgOptions: msgOptions, // 模态框是否显示
+      modalTitle: "", // 模态框标题
       formOptions: attendanceStatus.formOptions, // 表单属性
       btnTools: attendanceStatus.btnTools, // 工具按钮属性
       columnOptions: attendanceStatus.columnOptions, // 列属性
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }], // 页面显示数据 -- 表格
+      tableData: [], // 页面显示数据 -- 表格
       searchParam: { // 分页相关
         currentPage: 1,
         pageSize: 10
@@ -151,8 +133,11 @@ export default {
       count: 0 // 总的数据条数
     }
   },
+  created () {
+    this.getStatusList(1)
+  },
   methods: {
-    openDel,
+    openDel,  // 声明弹框事件
     /**
      * @description 触发搜索
      */
@@ -170,15 +155,33 @@ export default {
       this.dialogVisible = true;
 
     },
+    /**
+     * @description 模态框返回内容
+     */
     onModal (val) {
       console.log(val);
     },
+    /**
+     * @description 删除某行数据
+     */
     onTableDel (val) {
-      console.log('',val);
-      // this.searchParam = val;
-      // console.log(this.searchParam);
-      // this.getAdvList()
       this.openDel('是否确定删除该考勤状态？')
+    },
+    /**
+     * @description 获取考勤状态数据
+     */
+    async getStatusList (page) { // 获取数据列表
+      this.searchParam.currPage = page
+      console.log('123');
+      const res = await this.$request.getStatus({
+        ...this.searchParam
+      })
+      // console.log('res', res)
+      if (res.code == 0) {
+        // this.loading = false
+        this.count = res.data.total
+        this.tableData = res.data.list
+      }
     },
     /**
      * @description 还没用

@@ -89,7 +89,7 @@ export default {
         if (valid) {
           console.log('校验成功！')
           this.$emit("onModal", this.formInline)
-          this.$emit('update:dialogVisible', false)
+          this.resetForm ()
         } else {
           console.log("校验失败！")
           return false;

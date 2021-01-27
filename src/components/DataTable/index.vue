@@ -25,7 +25,7 @@
     <!-- 分页 -->
     <div class="block">
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page="searchParam.currentPage" :total="count" :page-sizes="[10, 20, 30, 50]"
+        :current-page="searchParam.currPage" :total="count" :page-sizes="[10, 20, 30, 50]"
         :page-size="searchParam.pageSize" layout="total, sizes, prev, pager, next, jumper">
       </el-pagination>
     </div>
@@ -100,6 +100,8 @@
         // console.log(`每页 ${val} 条`);
         this.searchParam.pageSize = val
         this.loading = true
+        this.$emit('pageSize', this.searchParam.pageSize)
+        // console.log('table',this.tableData);
         // this.getListData(1)
       },
       /**
@@ -108,6 +110,7 @@
       handleCurrentChange(val) {
         console.log(`当前页: ${val}`);
         this.loading = true
+        this.$emit('currPage', val)
         // this.getListData(val)
       },
       /**

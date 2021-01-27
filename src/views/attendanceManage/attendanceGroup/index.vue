@@ -40,9 +40,8 @@ import AttendanceTable from "@/components/DataTable/index";
 import AddGroupModal from "./components/addGroup";
 import ChoseUserModal from "./components/choseUser";
 
-// js文件 -- 传入组件内容
+// js文件 -- 1传入组件内容、2深拷贝、3弹框
 import { attendanceGroup } from "@/enum/attendance";
-
 import deepCopy from "@/utils/deepCopy"
 import { openDel, test } from "@/utils/messageBox"
 
@@ -51,46 +50,19 @@ export default {
     Current, // 当前位置
     AttendanceForm, // 表单
     AttendanceTable, // 表格+分页
-    // MyAttendanceModal,
     AddGroupModal,  // 新增+编辑模态框
     ChoseUserModal  // 选择人员模态框
   },
   data () {
     return {
-      rowData: {},
+      rowData: {},  // 某行数据
       dialogVisible: false, // 控制新增+编辑模态框是否显示
       isChoseUser: false,  // 控制选择人员模态框是否显示
       modalTitle: "", // 模态框标题
       formOptions: [], // 表单属性
       btnTools: attendanceGroup.btnTools, // 工具按钮属性
       columnOptions: attendanceGroup.columnOptions, // 列属性
-      tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-          day: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄",
-          day: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1519 弄",
-          day: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-          noDeleteIf: "true",
-          day: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-        },
-      ], // 页面显示数据 -- 表格
+      tableData: [], // 页面显示数据 -- 表格
       searchParam: {  // 分页相关
         currentPage: 1,
         pageSize: 10,
@@ -99,10 +71,10 @@ export default {
     };
   },
   created () {
-    // openDel()
+    this.getGroupList(1)
   },
   methods: {
-    openDel,
+    openDel,  // 声明弹框事件
     /**
      * @description 工具按钮返回内容
      */
@@ -146,6 +118,22 @@ export default {
       // console.log(this.rowData);
       this.modalTitle = "编辑考勤组"
       this.dialogVisible = true;
+    },
+    /**
+     * @description 获取考勤组数据
+     */
+    async getGroupList (page) {
+      this.searchParam.currPage = page
+      console.log('123');
+      const res = await this.$request.getGroup({
+        ...this.searchParam
+      })
+      console.log('res', res)
+      if (res.code == 0) {
+        // this.loading = false
+        this.count = res.data.total
+        this.tableData = res.data.list
+      }
     },
   },
 };
