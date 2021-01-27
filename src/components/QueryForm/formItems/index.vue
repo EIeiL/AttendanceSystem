@@ -61,6 +61,7 @@
       v-on="bindEvents"
       format="yyyy-MM-dd HH:mm:ss"
       value-format="yyyy-MM-dd HH:mm:ss"
+      :picker-options="pickerOptions0"
     >
     </el-date-picker>
 
@@ -126,6 +127,11 @@ export default {
   data () {
     return {
       pickerOptions1: picker.pickerOptions,
+      pickerOptions0: { // 如何动态选择？
+        disabledDate (time) {
+          return time.getTime() > Date.now() - 8.64e6;//如果没有后面的-8.64e6就是不可以选择今天的
+        }
+      },
     }
   },
   computed: {
@@ -216,20 +222,6 @@ export default {
     },
   },
   methods: {
-    // 未实现 限制时间日期选择器选择范围
-    pickerOptions (index) {
-      if (this.periodList[index].date) {
-        const date = this.periodList[index].date + '-01'
-        const startTime = moment(date).startOf('month').format('yyyy-MM-DD')
-        const endTime = moment(date).endOf('month').format('yyyy-MM-DD')
-        return {
-          disabledDate: time => {
-            const transTime = moment(time).format('yyyy-MM-DD')
-            return !moment(transTime).isBetween(moment(startTime).add(-4, 'days').format('yyyy-MM-DD'), moment(endTime).add(4, 'days').format('yyyy-MM-DD'))
-          }
-        }
-      }
-    },
   }
 }
 </script>

@@ -52,15 +52,15 @@ import { openDel } from "@/utils/messageBox"
 const msgOptions = [
   {
     label: "用户姓名",
-    prop: "name",
+    prop: "username",
     element: "el-input",
     placeholder: "请输入用户姓名",
     rules: [
-      { required: true, message: "请输入活动名称", trigger: "blur" },
+      { required: true, message: "请输入用户项目", trigger: "blur" },
     ]
   }, {
     label: "联系电话",
-    prop: "phone",
+    prop: "telephone",
     element: "el-input",
     placeholder: "请输入联系电话",
     rules: [
