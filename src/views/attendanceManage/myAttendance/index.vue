@@ -118,7 +118,8 @@ export default {
      */
     pageSize (val) {
       this.searchParam.pageSize = val
-      this.getAttendanceList(this.searchParam.currPage)
+      const currPage = this.count / this.searchParam.pageSize + 1
+      this.getAttendanceList(currPage)
     },
     /**
      * @description 跳转至某一页选择内容
@@ -200,5 +201,8 @@ export default {
 >>> .el-dialog__body {
   // 我的考勤
   padding-bottom: 0px;
+}
+>>> .del-nowDate .el-picker__footer .el-button--text {
+  display: none;
 }
 </style>

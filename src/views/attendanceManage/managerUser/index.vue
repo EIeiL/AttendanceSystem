@@ -18,6 +18,8 @@
       :count="count"
       @onTableDel="onTableDel"
       @onTableEdit="onTableEdit"
+      @pageSize="pageSize"
+      @currPage="currPage"
     />
     <!-- 模态框 -->
     <add-modal
@@ -49,27 +51,6 @@ import { managerUser } from "@/enum/attendance";
 import deepCopy from "@/utils/deepCopy"
 import { openDel } from "@/utils/messageBox"
 
-const msgOptions = [
-  {
-    label: "用户姓名",
-    prop: "username",
-    element: "el-input",
-    placeholder: "请输入用户姓名",
-    rules: [
-      { required: true, message: "请输入用户项目", trigger: "blur" },
-    ]
-  }, {
-    label: "联系电话",
-    prop: "telephone",
-    element: "el-input",
-    placeholder: "请输入联系电话",
-    rules: [
-      { required: true, message: "请输入联系电话", trigger: "blur" },
-    ]
-  }
-]
-
-
 export default {
   components: {
     Current, // 当前位置
@@ -82,15 +63,15 @@ export default {
     return {
       dialogVisible: false, // 添加用户模态框是否显示
       dialogVisible1: false,  // 导入用户模态框是否显示
-      msgOptions: msgOptions,
       modalTitle: "", // 模态框标题
       formOptions: managerUser.formOptions, // 表单属性
       btnTools: managerUser.btnTools, // 工具按钮属性
       columnOptions: managerUser.columnOptions, // 列属性
+      msgOptions: managerUser.msgOptions, // 模态框属性
       rowData: {},  // 某行数据
       tableData: [], // 页面显示数据 -- 表格
       searchParam: {  // 分页相关
-        currentPage: 1,
+        currPage: 1,
         pageSize: 10,
       },
       count: 0, // 总的数据条数
@@ -104,8 +85,35 @@ export default {
     /**
      * @description 触发搜索
      */
-    onSearch (val) {
-      this.searchParam = val;
+    async onSearch (val) {
+      // this.searchParam = val;
+      console.log('搜索val', val);
+      if (val.keywords === '1') {
+        var res = await this.$request.getUser({
+          ...this.searchParam,
+          id: val.content
+        })
+      } else if (val.keywords === '2') {
+        var res = await this.$request.getUser({
+          ...this.searchParam,
+          username: val.content
+        })
+      } else if (val.keywords === '3') {
+        var res = await this.$request.getUser({
+          ...this.searchParam,
+          telephone: val.content
+        })
+      } else {
+        var res = await this.$request.getUser({
+          ...this.searchParam
+        })
+      }
+      if (res && res.code == 0) {
+        // this.getAttendanceList(1)
+        console.log('success')
+        this.count = res.data.total
+        this.tableData = res.data.list
+      }
     },
     /**
      * @description 工具按钮返回内容
@@ -113,6 +121,7 @@ export default {
     toolsBtn (val) {
       // console.log(val);
       if (val == "addUser") {
+        this.rowData = {}
         this.modalTitle = "添加用户"
         this.dialogVisible = true;
       } else {
@@ -122,19 +131,21 @@ export default {
     /**
      * @description 删除某行数据
      */
-    onTableDel (val) {
-      console.log(val);
-      // this.searchParam = val;
-      // console.log(this.searchParam);
-      // this.getAdvList()
-      this.openDel('是否确定删除该用户？')
+    async onTableDel (val) {
+      // console.log(val);
+      // this.openDel('是否确定删除该用户？')
+      var res = await this.$request.delUser({
+        id: val.id
+      })
+      if (res.code == 0) {
+        console.log('删除success')
+        this.getUserList(1)
+      }
     },
     /**
      * @description 编辑某行数据
      */
     onTableEdit (val) {
-      console.log('编辑', val);
-      // this.rowData = JSON.parse(val)
       var o;
       if (typeof val === 'object') {
         o = deepCopy.copyObject(val);
@@ -142,18 +153,33 @@ export default {
         o = val;
       }
       this.rowData = o
-      // console.log(this.rowData);
       this.modalTitle = "编辑用户"
       this.dialogVisible = true;
     },
     /**
      * @description 添加用户模态框返回内容
      */
-    onModal (val) {
-      console.log(val);
-      console.log('编辑之后', val);
+    async onModal (val) {
       if (this.modalTitle == "编辑用户") {
-        this.rowData = val
+        console.log('编辑val', val);
+        const res = await this.$request.editUser({
+          id: val.id,
+          telephone: val.telephone,
+          username: val.username
+        })
+        if (res.code == 0) {
+          // this.getAttendanceList(1)
+          console.log('success')
+          this.getUserList(1)
+        }
+      } else {
+        const res = await this.$request.addUser({
+          ...val
+        })
+        if (res.code == 0) {
+          console.log('success')
+          this.getUserList(1)
+        }
       }
     },
     /**
@@ -161,6 +187,21 @@ export default {
      */
     onModal1 (val) {
       console.log(val);
+    },
+    /**
+     * @description 选择每页数据条数返回内容
+     */
+    pageSize (val) {
+      this.searchParam.pageSize = val
+      const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
+      this.getUserList(currPage)
+    },
+    /**
+     * @description 跳转至某一页选择内容
+     */
+    currPage (val) {
+      this.searchParam.currPage = val
+      this.getUserList(this.searchParam.currPage)
     },
     /**
      * @description 获取用户数据

@@ -1,4 +1,6 @@
+// 我的考勤 板块
 export const myAttendance = {
+  // 表单属性
   formOptions: [
     {
       label: '状态名称',
@@ -17,12 +19,14 @@ export const myAttendance = {
       placeholder: '请输入需要搜索的内容'
     }
   ],
+  // 工具按钮属性
   btnTools: [
     {
       prop: 'addRecord',
       text: '添加考勤记录'
     }
   ],
+  // 表格列属性
   columnOptions: [
     {
       prop: 'userName',
@@ -42,6 +46,7 @@ export const myAttendance = {
       operate: ''
     }
   ],
+  // 模态框表单属性
   modalOptions: [
     {
       label: "用户姓名",
@@ -60,8 +65,7 @@ export const myAttendance = {
       element: "el-date-picker",
       rules: [
         { required: true, message: "请选择考勤时间", trigger: "blur" },
-      ],
-      value: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
+      ]
     }, {
       label: "",
       element: "el-text",
@@ -70,7 +74,7 @@ export const myAttendance = {
     }
   ]
 }
-
+// 用户管理 板块
 export const managerUser = {
   formOptions: [
     {
@@ -79,13 +83,13 @@ export const managerUser = {
       placeholder: '选择关键词',
       options: [{
         label: '序号',
-        value: '序号'
+        value: '1'
       }, {
         label: '用户姓名',
-        value: '用户姓名'
+        value: '2'
       }, {
         label: '联系电话',
-        value: '联系电话'
+        value: '3'
       }]
     }, {
       prop: 'content',
@@ -127,9 +131,39 @@ export const managerUser = {
       label: '操作',
       operate: 'edit,delete'
     }
+  ],
+  msgOptions: [
+    {
+      label: "用户姓名",
+      prop: "username",
+      element: "el-input",
+      placeholder: "请输入用户姓名",
+      rules: [
+        { required: true, message: "请输入用户姓名", trigger: "blur" },
+        { min: 2, max: 5, message: '长度在 2 到 5 个字符' },
+        { pattern: /^[\u4E00-\u9FA5]+$/, message: '用户名只能为中文' }
+      ]
+    }, {
+      label: "联系电话",
+      prop: "telephone",
+      element: "el-input",
+      placeholder: "请输入联系电话",
+      rules: [
+        { required: true, message: "请输入电话号码", trigger: "blur" },
+        {
+          validator: function (rule, value, callback) {
+            if (/^1[34578]\d{9}$/.test(value) == false) {
+              callback(new Error("请输入有效的电话号码"));
+            } else {
+              callback();
+            }
+          }, trigger: 'blur'
+        }
+      ]
+    }
   ]
 }
-
+// 考勤状态 板块
 export const attendanceStatus = {
   formOptions: [{
     label: '状态名称',
@@ -184,7 +218,7 @@ export const attendanceStatus = {
     }
   ]
 }
-
+// 考勤组管理 -- 板块
 export const attendanceGroup = {
   btnTools: [{
     prop: 'addGroup',

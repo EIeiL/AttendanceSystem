@@ -17,6 +17,8 @@
       :count="count"
       @onTableDel="onTableDel"
       @onTableEdit="onTableEdit"
+      @pageSize="pageSize"
+      @currPage="currPage"
     />
     <!-- 模态框 -->
     <addGroup-modal
@@ -64,7 +66,7 @@ export default {
       columnOptions: attendanceGroup.columnOptions, // 列属性
       tableData: [], // 页面显示数据 -- 表格
       searchParam: {  // 分页相关
-        currentPage: 1,
+        currPage: 1,
         pageSize: 10,
       },
       count: 0, // 总的数据条数
@@ -98,9 +100,16 @@ export default {
     /**
      * @description 点击删除触发事件
      */
-    onTableDel (val) {
-      console.log(val);
-      this.openDel('是否确定删除该考勤组？')
+    async onTableDel (val) {
+      // console.log(val);
+      // this.openDel('是否确定删除该考勤组？')
+      var res = await this.$request.delGroup({
+        id: val.id
+      })
+      if (res.code == 0) {
+        console.log('删除success')
+        this.getGroupList(1)
+      }
     },
     /**
      * @description 点击编辑触发事件
@@ -118,6 +127,21 @@ export default {
       // console.log(this.rowData);
       this.modalTitle = "编辑考勤组"
       this.dialogVisible = true;
+    },
+    /**
+     * @description 选择每页数据条数返回内容
+     */
+    pageSize (val) {
+      this.searchParam.pageSize = val
+      const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
+      this.getGroupList(currPage)
+    },
+    /**
+     * @description 跳转至某一页选择内容
+     */
+    currPage (val) {
+      this.searchParam.currPage = val
+      this.getGroupList(this.searchParam.currPage)
     },
     /**
      * @description 获取考勤组数据

@@ -18,6 +18,8 @@
       :count="count"
       @onTableDel="onTableDel"
       @onTableEdit="onTableEdit"
+      @pageSize="pageSize"
+      @currPage="currPage"
     />
     <!-- 模态框 -->
     <addStatus-modal
@@ -119,15 +121,15 @@ export default {
   },
   data () {
     return {
-      dialogVisible: false, 
-      msgOptions: msgOptions, // 模态框是否显示
+      dialogVisible: false,  // 模态框是否显示
+      msgOptions: msgOptions, // 模态框属性
       modalTitle: "", // 模态框标题
       formOptions: attendanceStatus.formOptions, // 表单属性
       btnTools: attendanceStatus.btnTools, // 工具按钮属性
       columnOptions: attendanceStatus.columnOptions, // 列属性
       tableData: [], // 页面显示数据 -- 表格
       searchParam: { // 分页相关
-        currentPage: 1,
+        currPage: 1,
         pageSize: 10
       },
       count: 0 // 总的数据条数
@@ -164,8 +166,30 @@ export default {
     /**
      * @description 删除某行数据
      */
-    onTableDel (val) {
-      this.openDel('是否确定删除该考勤状态？')
+    async onTableDel (val) {
+      // this.openDel('是否确定删除该考勤状态？')
+      var res = await this.$request.delStatus({
+        id: val.id
+      })
+      if (res.code == 0) {
+        console.log('删除success')
+        this.getStatusList(1)
+      }
+    },
+    /**
+     * @description 选择每页数据条数返回内容
+     */
+    pageSize (val) {
+      this.searchParam.pageSize = val
+      const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
+      this.getStatusList(currPage)
+    },
+    /**
+     * @description 跳转至某一页选择内容
+     */
+    currPage (val) {
+      this.searchParam.currPage = val
+      this.getStatusList(this.searchParam.currPage)
     },
     /**
      * @description 获取考勤状态数据
