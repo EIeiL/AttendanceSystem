@@ -118,7 +118,7 @@ export default {
      */
     pageSize (val) {
       this.searchParam.pageSize = val
-      const currPage = this.count / this.searchParam.pageSize + 1
+      const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
       this.getAttendanceList(currPage)
     },
     /**
