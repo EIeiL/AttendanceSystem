@@ -81,7 +81,7 @@ export default {
      * @description 工具按钮返回内容
      */
     toolsBtn (val) {
-      console.log(val);
+      console.log('点击添加考勤组按钮', val);
       this.modalTitle = "添加考勤组";
       this.dialogVisible = true;
     },
@@ -89,19 +89,19 @@ export default {
      * @description 新增+编辑模态框返回内容
      */
     onModal (val) {
-      console.log(val);
+      console.log('新增+编辑模态框返回内容', val);
     },
     /**
      * @description 选择人员模态框返回内容
      */
     onModal1 (val) {
-      console.log(val);
+      console.log('选择人员模态框', val);
     },
     /**
      * @description 点击删除触发事件
      */
     async onTableDel (val) {
-      // console.log(val);
+      console.log('点击删除', val);
       // this.openDel('是否确定删除该考勤组？')
       var res = await this.$request.delGroup({
         id: val.id
@@ -115,7 +115,7 @@ export default {
      * @description 点击编辑触发事件
      */
     onTableEdit (val) {
-      console.log('编辑', val);
+      console.log('点击编辑', val);
       // this.rowData = JSON.parse(val)
       var o;
       if (typeof val === 'object') {
@@ -148,12 +148,11 @@ export default {
      */
     async getGroupList (page) {
       this.searchParam.currPage = page
-      console.log('123');
       const res = await this.$request.getGroup({
         ...this.searchParam
       })
-      console.log('res', res)
-      if (res.code == 0) {
+      console.log('获取考勤组数据', res)
+      if (res.code == 0 && res.data.list && res.data.total) {
         // this.loading = false
         this.count = res.data.total
         this.tableData = res.data.list

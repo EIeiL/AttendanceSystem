@@ -145,23 +145,22 @@ export default {
      */
     onSearch (val) {
       this.searchParam = val
-      // console.log(this.searchParam);
+      console.log('搜索考勤状态',this.searchParam);
       // this.getAdvList()
     },
     /**
      * @description 工具按钮返回内容
      */
     toolsBtn (val) {
-      console.log(val);
+      console.log('添加考勤状态',val);
       this.modalTitle = "添加状态";
       this.dialogVisible = true;
-
     },
     /**
      * @description 模态框返回内容
      */
     onModal (val) {
-      console.log(val);
+      console.log('添加考勤状态模态框返回',val);
     },
     /**
      * @description 删除某行数据
@@ -171,6 +170,7 @@ export default {
       var res = await this.$request.delStatus({
         id: val.id
       })
+      console.log('删除考勤状态',res);
       if (res.code == 0) {
         console.log('删除success')
         this.getStatusList(1)
@@ -196,12 +196,11 @@ export default {
      */
     async getStatusList (page) { // 获取数据列表
       this.searchParam.currPage = page
-      console.log('123');
       const res = await this.$request.getStatus({
         ...this.searchParam
       })
-      // console.log('res', res)
-      if (res.code == 0) {
+      console.log('获取考勤状态数据', res)
+      if (res.code == 0 && res.data.list && res.data.total) {
         // this.loading = false
         this.count = res.data.total
         this.tableData = res.data.list

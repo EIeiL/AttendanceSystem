@@ -134,7 +134,7 @@ export default {
     async getUserList () {
       const res = await this.$request.getMyUser({
       })
-      // console.log('res', res)
+      console.log('用户res', res)
       if (res.code == 0) {
         for (var i = 0; i < res.data.length; i++) {
           const user = {
@@ -151,7 +151,7 @@ export default {
     async getStatusList () {
       const res = await this.$request.getStatus({
       })
-      // console.log('res', res)
+      console.log('状态res', res)
       if (res.code == 0) {
         console.log('打印状态信息', res.data.list);
         for (var i = 0; i < res.data.list.length; i++) {
@@ -171,8 +171,8 @@ export default {
       const res = await this.$request.getMyattendance({
         ...this.searchParam
       })
-      // console.log('res', res)
-      if (res.code == 0) {
+      console.log('考勤res', res)
+      if (res.code == 0 && res.data.list && res.data.total) {
         // this.loading = false
         this.count = res.data.total
         const tableDataTemp = []

@@ -87,7 +87,7 @@ export default {
      */
     async onSearch (val) {
       // this.searchParam = val;
-      console.log('搜索val', val);
+      console.log('搜索用户', val);
       if (val.keywords === '1') {
         var res = await this.$request.getUser({
           ...this.searchParam,
@@ -110,7 +110,7 @@ export default {
       }
       if (res && res.code == 0) {
         // this.getAttendanceList(1)
-        console.log('success')
+        console.log('搜索用户success')
         this.count = res.data.total
         this.tableData = res.data.list
       }
@@ -119,7 +119,6 @@ export default {
      * @description 工具按钮返回内容
      */
     toolsBtn (val) {
-      // console.log(val);
       if (val == "addUser") {
         this.rowData = {}
         this.modalTitle = "添加用户"
@@ -169,7 +168,7 @@ export default {
         })
         if (res.code == 0) {
           // this.getAttendanceList(1)
-          console.log('success')
+          console.log('编辑success')
           this.getUserList(1)
         }
       } else {
@@ -177,7 +176,7 @@ export default {
           ...val
         })
         if (res.code == 0) {
-          console.log('success')
+          console.log('添加success')
           this.getUserList(1)
         }
       }
@@ -186,7 +185,7 @@ export default {
      * @description 导入用户模态框返回内容
      */
     onModal1 (val) {
-      console.log(val);
+      console.log('导入用户',val);
     },
     /**
      * @description 选择每页数据条数返回内容
@@ -208,12 +207,11 @@ export default {
      */
     async getUserList (page) {
       this.searchParam.currPage = page
-      console.log('123');
       const res = await this.$request.getUser({
         ...this.searchParam
       })
-      console.log('res', res)
-      if (res.code == 0) {
+      console.log('获取用户数据', res)
+      if (res.code == 0 && res.data.list && res.data.total) {
         // this.loading = false
         this.count = res.data.total
         this.tableData = res.data.list
