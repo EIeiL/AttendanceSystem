@@ -9,25 +9,38 @@
     >
       <div class="demo-drawer__content">
         <el-form
-          :model="group"
+          :model="rowData"
           :rules="rules"
-          ref="group"
+          ref="rowData"
           label-width="150px"
-          class="demo-group"
+          class="demo-rowData"
         >
           <el-form-item label="考勤组名称：" prop="name">
-            <el-input v-model="group.name"></el-input>
+            <el-input v-model="rowData.name"></el-input>
           </el-form-item>
           <el-form-item label="参与考勤人员：" prop="name">
-            <el-button size="small" @click="choseUser">请选择 > </el-button>
+            <el-button
+              size="small"
+              v-if="rowData.peopleSize > 0"
+              @click="choseUser"
+              >共 {{ rowData.peopleSize }} 人
+            </el-button>
+            <el-button
+              size="small"
+              v-else
+              @click="choseUser"
+              >请选择 >
+            </el-button>
           </el-form-item>
           <el-form-item label="考勤组名称：" prop="day">
-            <el-radio-group v-model="group.day">
-              <el-radio
-                label="固定班制（每天考勤时间一样，适用于固定上班时间制的员工）"
-              ></el-radio>
+            <el-radio-group v-model="rowData.type">
+              <el-radio :label="0" value="0"
+                >固定班制（每天考勤时间一样，适用于固定上班时间制的员工）</el-radio
+              >
               <div style="height: 6px"></div>
-              <el-radio label="大小周制（适用于大小周制的员工）"></el-radio>
+              <el-radio :label="1" value="1"
+                >大小周制（适用于大小周制的员工）</el-radio
+              >
             </el-radio-group>
           </el-form-item>
           <el-form-item label="考勤时间段：" prop="day">
@@ -39,13 +52,13 @@
             class="del-marginBottom"
           >
             <el-checkbox-group v-model="day">
-              <el-checkbox label="周一" disabled></el-checkbox>
-              <el-checkbox label="周二" disabled></el-checkbox>
-              <el-checkbox label="周三" disabled></el-checkbox>
-              <el-checkbox label="周四" disabled></el-checkbox>
-              <el-checkbox label="周五" disabled></el-checkbox>
-              <el-checkbox label="周六"></el-checkbox>
-              <el-checkbox label="周日"></el-checkbox>
+              <el-checkbox :label="1" disabled>周一</el-checkbox>
+              <el-checkbox :label="2" disabled>周二</el-checkbox>
+              <el-checkbox :label="3" disabled>周三</el-checkbox>
+              <el-checkbox :label="4" disabled>周四</el-checkbox>
+              <el-checkbox :label="5" disabled>周五</el-checkbox>
+              <el-checkbox :label="6">周六</el-checkbox>
+              <el-checkbox :label="7">周日</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
           <el-calendar v-model="value" class="attendance-calendar">
@@ -84,35 +97,35 @@ export default {
     },
     modalTitle: {
       type: String,
-      default () {
+      default() {
         return "添加用户";
       },
     },
     rowData: {
       type: Object,
-      default () {
-        return {}
-      }
-    }
+      default() {
+        return {};
+      },
+    },
   },
   watch: {
-    'rowData': {
-      handler (val) {
-        console.log('val', val);
-        this.group = val
+    rowData: {
+      handler(val) {
+        console.log("val", val);
+        this.group = val;
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
-  data () {
+  data() {
     return {
       timer: null,
       loading: false,
-      day: ['周一', '周六', '周日'],
-      group: { day: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] },
+      day: [6,7],
+      group: { day: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"] },
       rules: {
         // 校验规则
-        day: [{ required: true, message: " ", trigger: "blur" },],
+        day: [{ required: true, message: " ", trigger: "blur" }],
         name: [
           { required: true, message: "请输入活动名称", trigger: "blur" },
           { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
@@ -129,8 +142,8 @@ export default {
     /**
      * @description 添加按钮触发事件
      */
-    submitForm () {
-      this.$refs["group"].validate((valid) => {
+    submitForm() {
+      this.$refs["rowData"].validate((valid) => {
         if (valid) {
           // console.log("this.group", this.group);
           this.$emit("onModal", this.group);
@@ -145,20 +158,20 @@ export default {
     /**
      * @description 取消/关闭按钮触发事件
      */
-    resetForm () {
-      this.$refs["group"].resetFields();
+    resetForm() {
+      this.$refs["rowData"].resetFields();
       // this.dialogVisible = false;
       this.$emit("update:dialogVisible", false);
     },
     /**
      * 抽屉加入
      */
-    handleClose (done) {
+    handleClose(done) {
       if (this.loading) {
         return;
       }
-      this.$confirm('确定要提交表单吗？')
-        .then(_ => {
+      this.$confirm("确定要提交表单吗？")
+        .then((_) => {
           this.loading = true;
           this.timer = setTimeout(() => {
             done();
@@ -168,20 +181,19 @@ export default {
             }, 400);
           }, 2000);
         })
-        .catch(_ => { });
+        .catch((_) => {});
     },
-    cancelForm () {
+    cancelForm() {
       this.loading = false;
       this.dialog = false;
       clearTimeout(this.timer);
     },
-    choseUser () {
-      console.log('123改变isChoseUser');
+    choseUser() {
+      console.log("改变isChoseUser");
       this.$emit("update:isChoseUser", true);
       // console.log('改变dialogVisible1',dialogVisible1);
-    }
-  }
-
+    },
+  },
 };
 </script>
 

@@ -12,6 +12,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "element-ui": "^2.15.0",
     "postcss-px2rem": "^0.3.0",
     "scss": "^0.2.4",

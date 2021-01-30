@@ -9,26 +9,35 @@
     >
       <span>
         <!-- 这是一段信息 -->
-        <el-form :model="status" ref="status" class="demo-status">
+        <el-form :model="chose" ref="chose" class="demo-chose">
           <span class="people-search">
-            <el-input v-model="search"></el-input>
+            <el-input
+              v-model="search"
+              placeholder="输入关键字进行搜索"
+            ></el-input>
           </span>
           <span class="form-left">
-            <el-checkbox-group v-model="checkd"
-              ><ul class="infinite-list" v-infinite-scroll="load">
-                <li v-for="i in counts" class="infinite-list-item">
-                  <el-checkbox :label="i"></el-checkbox>
-                </li></ul
-            ></el-checkbox-group>
+            <el-checkbox-group
+              v-model="checkd"
+              v-for="(item, index) in users"
+              :key="index"
+            >
+              <el-checkbox :label="item.username"></el-checkbox>
+            </el-checkbox-group>
           </span>
           <div></div>
           <span class="form-right"
             ><el-form-item>
               <div class="people-title">已选人员:</div>
               <div>
-                <el-button class="people-button" v-for="i in checkd"
-                  >{{ i }} <span class="red-icon">X</span></el-button
+                <el-button
+                  class="people-button"
+                  v-for="(item, index) in checkd"
+                  :key="index"
+                  @click="delUser"
                 >
+                  {{ item }} <span class="red-icon">X</span>
+                </el-button>
               </div>
             </el-form-item></span
           >
@@ -50,74 +59,86 @@ export default {
       // 控制模态框是否显示
       type: Boolean,
       default: false,
-    }
+    },
   },
-  data () {
+  data() {
     return {
       count: 0,
-      counts: [],
-      checkd: [3, 6, 5],
-      search: '',
-      status: { people: [] },
-      rules: {
-        // 校验规则
-        name: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
-        ],
-        phone: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
-        ],
-      },
-      value: new Date(),
+      counts: [], // 所有人员名单
+      users: [],
+      search: "", // 输入框内容
+      checkd: [], // 选中人员名单
+      chose: {}, // 表单绑定 目前无用
     };
   },
+  watch: {
+    search: {
+      handler(val) {
+        this.users = [];
+        for (var i = 0; i < this.counts.length; i++) {
+          if (this.search == this.counts[i].username) {
+            this.users.push(this.counts[i]);
+          }
+        }
+      },
+      // deep: true
+    },
+  },
+  created() {
+    this.getUserList();
+  },
   methods: {
-    load () {
-      if (this.count < 100) {
-        this.count += 2
-        this.counts.push(this.count)
+    /**
+     * @description 加载姓名列表
+     */
+    load() {
+      if (this.count < this.counts.length) {
+        this.count += 1;
+      }
+    },
+    /**
+     * @description 获取用户列表
+     */
+    async getUserList() {
+      const res = await this.$request.getMyUser({});
+      // console.log('res', res)
+      if (res.code == 0 && res.data.length > 0) {
+        this.counts = res.data;
+        this.users = this.counts;
       }
     },
     /**
      * @description 添加按钮触发事件
      */
-    submitForm () {
-      console.log(this.counts);
-      this.$refs["status"].validate((valid) => {
-        if (valid) {
-          // console.log("this.group", this.group);
-          this.$emit("onModal", this.status);
-          this.$emit("update:isChoseUser", false);
-          // this.resetForm(formName);
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
+    submitForm() {
+      this.$emit("onModal1", this.checkd);
+      this.resetForm();
     },
     /**
      * @description 取消/关闭按钮触发事件
      */
-    resetForm () {
-      this.$refs["status"].resetFields();
-      // this.dialogVisible = false;
+    resetForm() {
+      // this.$refs["chose"].resetFields();
+      this.search = "";
+      this.checkd = [];
       this.$emit("update:isChoseUser", false);
     },
-    delUser (val) {
-      console.log('ssss', val);
+    /**
+     * @description 删除选中人员
+     */
+    delUser(val) {
+      // console.log("删除人员：", val);
       this.checkd.splice(val, 1);
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
 >>> .el-dialog__header {
   border-bottom: 1px solid #ccc;
 }
-.demo-status {
+.demo-chose {
   display: flex;
   flex-direction: row;
   .people-search {
@@ -135,6 +156,9 @@ export default {
     width: 320px;
     height: 260px;
     overflow: auto;
+    .el-checkbox{
+      font-size: 18px;
+    }
   }
   .form-right {
     width: 300px;
