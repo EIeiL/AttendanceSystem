@@ -46,7 +46,7 @@ import ChoseUserModal from './components/choseUser'
 // js文件 -- 1传入组件内容、2深拷贝、3弹框
 import { attendanceGroup } from '@/enum/attendance'
 import deepCopy from '@/utils/deepCopy'
-import { openDel } from '@/utils/messageBox'
+import { openTip } from '@/utils/messageBox'
 
 export default {
   components: {
@@ -79,7 +79,7 @@ export default {
     this.getGroupList(1)
   },
   methods: {
-    openDel, // 声明弹框事件
+    openTip, // 声明弹框事件
     /**
      * @description 工具按钮返回内容
      */
@@ -99,6 +99,10 @@ export default {
       })
       // console.log('res', res)
       if (res.code === 0) {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
         this.getAttendanceList(1)
       }
     },
@@ -114,15 +118,24 @@ export default {
      * @description 点击删除触发事件
      */
     async onTableDel (val) {
-      // console.log('点击删除', val)
-      // this.openDel('是否确定删除该考勤组？')
-      var res = await this.$request.delGroup({
-        id: val.id
-      })
-      if (res.code === 0) {
-        // console.log('删除success')
-        this.getGroupList(1)
-      }
+      this.openTip('是否确定删除该考勤组？', '删除提示')
+        .then(async () => {
+          var res = await this.$request.delGroup({
+            id: val.id
+          })
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.getGroupList(1)
+          }
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
     /**
      * @description 点击编辑触发事件

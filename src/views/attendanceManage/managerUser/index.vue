@@ -32,7 +32,7 @@
     />
     <importUser-modal
       :dialogVisible1.sync="dialogVisible1"
-      @onModal1="getUserList (1)"
+      @onModal1="onModal1"
     />
   </div>
 </template>
@@ -47,10 +47,10 @@ import AddModal from '@/components/ModalBox/addModal/index'
 // 业务组件 -- 导入用户模态框
 import ImportUserModal from './components/importUser'
 
-// js文件 -- 传入组件内容、深拷贝、弹框
+// js文件 -- 1传入组件内容、2深拷贝、3弹框
 import { managerUser } from '@/enum/attendance'
 import deepCopy from '@/utils/deepCopy'
-import { openDel } from '@/utils/messageBox'
+import { openTip } from '@/utils/messageBox'
 
 export default {
   components: {
@@ -83,7 +83,7 @@ export default {
     this.getUserList(1)
   },
   methods: {
-    openDel, // 声明弹框事件
+    openTip, // 声明弹框事件
     /**
      * @description 触发搜索
      */
@@ -139,15 +139,24 @@ export default {
      * @description 删除某行数据
      */
     async onTableDel (val) {
-      // console.log(val);
-      // this.openDel('是否确定删除该用户？')
-      var res = await this.$request.delUser({
-        id: val.id
-      })
-      if (res.code === 0) {
-        // console.log('删除success')
-        this.getUserList(1)
-      }
+      this.openTip('是否确定删除该用户', '删除提示')
+        .then(async () => {
+          var res = await this.$request.delUser({
+            id: val.id
+          })
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.getUserList(1)
+          }
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
     /**
      * @description 编辑某行数据
@@ -178,15 +187,23 @@ export default {
         if (res.code === 0) {
           // this.getAttendanceList(1)
           // console.log('编辑success')
+          this.$message({
+            type: 'info',
+            message: '编辑成功'
+          })
           this.getUserList(1)
         }
       } else {
         const res = await this.$request.addUser({
           ...val
         })
-        console.log('添加res', res)
+        // console.log('添加res', res)
         if (res.code === 0) {
-          console.log('添加success')
+          // console.log('添加success')
+          this.$message({
+            type: 'info',
+            message: '添加成功'
+          })
           this.getUserList(1)
         }
       }
@@ -196,6 +213,11 @@ export default {
      */
     onModal1 (val) {
       // console.log('导入用户', val)
+      this.$message({
+        type: 'info',
+        message: '导入成功xx条，导入失败xx条'
+      })
+      this.getUserList(1)
     },
     /**
      * @description 选择每页数据条数返回内容

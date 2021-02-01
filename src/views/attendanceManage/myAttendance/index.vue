@@ -112,6 +112,10 @@ export default {
       })
       // console.log('res', res)
       if (res.code === 0) {
+        this.$message({
+          type: 'info',
+          message: '添加成功!'
+        })
         this.getAttendanceList(1)
       }
     },

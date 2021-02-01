@@ -84,8 +84,7 @@ export default {
     /**
      * @description 添加按钮触发事件
      */
-    submitForm () {
-      console.log('提交')
+    submitForm () { 
       this.loading = true
       this.$refs['formInline'].validate((valid) => {
         if (valid) {
@@ -95,7 +94,7 @@ export default {
           this.resetForm()
         } else {
           console.log('校验失败！')
-          return false
+          this.loading = false
         }
       })
     },

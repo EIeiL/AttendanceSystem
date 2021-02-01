@@ -38,7 +38,7 @@
               class="delColor"
               v-if="
                 item.operate.includes('delete') &&
-                (item.judgeIf ? !scope.row.noDeleteIf : true)
+                (item.judgeIf ? !scope.row.ifDel : true)
               "
               >删除</el-button
             >

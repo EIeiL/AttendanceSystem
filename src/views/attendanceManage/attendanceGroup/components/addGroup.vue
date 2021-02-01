@@ -18,7 +18,7 @@
           <el-form-item label="考勤组名称：" prop="name">
             <el-input v-model="rowData.name"></el-input>
           </el-form-item>
-          <el-form-item label="参与考勤人员：" prop="name">
+          <el-form-item label="参与考勤人员：">
             <el-button
               size="small"
               v-if="rowData.peopleSize > 0"
@@ -119,6 +119,8 @@ export default {
             this.day.push(day[i] - 0)
           }
           console.log('this.day', this.day)
+        } else {
+          this.day = []
         }
       },
       deep: true

@@ -40,10 +40,10 @@ import AttendanceTable from '@/components/DataTable/index'
 // 业务组件 -- 添加状态模态框
 import AddStatusModal from './components/addStatus'
 
-// js文件 -- 传入组件内容、深拷贝、弹框
+// js文件 -- 1传入组件内容、2深拷贝、3弹框
 import { attendanceStatus } from '@/enum/attendance'
 import deepCopy from '@/utils/deepCopy'
-import { openDel } from '@/utils/messageBox'
+import { openTip } from '@/utils/messageBox'
 
 export default {
   components: {
@@ -72,7 +72,7 @@ export default {
     this.getStatusList(1)
   },
   methods: {
-    openDel, // 声明弹框事件
+    openTip, // 声明弹框事件
     /**
      * @description 触发搜索
      */
@@ -100,22 +100,41 @@ export default {
       })
       // console.log('res', res)
       if (res.code === 0) {
+        this.$message({
+          type: 'info',
+          message: '添加成功'
+        })
         this.getStatusList(1)
+      } else if (res.code === 500) {
+        // this.openTip(res.msg, '提示')
+        this.$message({
+          type: 'info',
+          message: res.msg
+        })
       }
     },
     /**
      * @description 删除某行数据
      */
     async onTableDel (val) {
-      // this.openDel('是否确定删除该考勤状态？')
-      var res = await this.$request.delStatus({
-        id: val.id
-      })
-      // console.log('删除考勤状态', res)
-      if (res.code === 0) {
-        // console.log('删除success')
-        this.getStatusList(1)
-      }
+      this.openTip('是否确定删除该考勤状态？', '删除提示')
+        .then(async () => {
+          var res = await this.$request.delStatus({
+            id: val.id
+          })
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.getStatusList(1)
+          }
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })    
     },
     /**
      * @description 选择每页数据条数返回内容
