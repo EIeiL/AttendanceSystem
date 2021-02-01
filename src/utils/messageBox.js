@@ -4,8 +4,8 @@
  * @description 删除弹框
  */
 export function openDel (msg) {
-  console.log('删除',msg);
-  console.log('this',this);
+  console.log('删除', msg)
+  console.log('this', this)
   this.$confirm(msg, '删除提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -14,13 +14,13 @@ export function openDel (msg) {
     this.$message({
       type: 'success',
       message: '删除成功!'
-    });
+    })
   }).catch(() => {
     this.$message({
       type: 'info',
       message: '已取消删除'
-    });
-  });
+    })
+  })
 }
 
 /**
@@ -37,7 +37,7 @@ export function openTip (msg) {
   }).catch(() => {
     console.log('点击取消按钮')
     return false
-  });
+  })
 }
 
 // export default {

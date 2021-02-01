@@ -43,7 +43,7 @@
               >
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="考勤时间段：" prop="day">
+          <el-form-item label="考勤时间段：">
             <span>9:00-12:30，14:00-18:00</span>
           </el-form-item>
           <el-form-item
@@ -51,7 +51,7 @@
             prop="day"
             class="del-marginBottom"
           >
-            <el-checkbox-group v-model="day">
+            <el-checkbox-group v-model="day" prop="day">
               <el-checkbox :label="1" disabled>周一</el-checkbox>
               <el-checkbox :label="2" disabled>周二</el-checkbox>
               <el-checkbox :label="3" disabled>周三</el-checkbox>
@@ -88,113 +88,123 @@ export default {
     dialogVisible: {
       // 控制模态框是否显示
       type: Boolean,
-      default: false,
+      default: false
     },
     isChoseUser: {
       // 控制模态框是否显示
       type: Boolean,
-      default: false,
+      default: false
     },
     modalTitle: {
       type: String,
-      default() {
-        return "添加用户";
-      },
+      default () {
+        return '添加用户'
+      }
     },
     rowData: {
       type: Object,
-      default() {
-        return {};
-      },
-    },
+      default () {
+        return {}
+      }
+    }
   },
   watch: {
     rowData: {
-      handler(val) {
-        console.log("val", val);
-        this.group = val;
+      handler (val) {
+        console.log('val', val)
+        this.group = val
+        if (this.rowData.dayoff) {
+          const day = this.rowData.dayoff.split(',')
+          for (var i = 0; i < day.length; i++) {
+            this.day.push(day[i] - 0)
+          }
+          console.log('this.day', this.day)
+        }
       },
-      deep: true,
-    },
+      deep: true
+    }
   },
-  data() {
+  data () {
     return {
       timer: null,
       loading: false,
-      day: [6,7],
-      group: { day: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"] },
+      day: [],
+      group: { day: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] },
       rules: {
         // 校验规则
-        day: [{ required: true, message: " ", trigger: "blur" }],
         name: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
-        ],
-        phone: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
-        ],
+          { required: true, message: '请输入活动名称', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ]
       },
-      value: new Date(),
-    };
+      value: new Date()
+    }
   },
   methods: {
     /**
      * @description 添加按钮触发事件
      */
-    submitForm() {
-      this.$refs["rowData"].validate((valid) => {
+    submitForm () {
+      this.$refs['rowData'].validate((valid) => {
         if (valid) {
-          // console.log("this.group", this.group);
-          this.$emit("onModal", this.group);
-          this.$emit("update:dialogVisible", false);
+          console.log('this.group', this.group)
+          this.rowData.dayoff = ''
+          this.rowData.users = {}
+          for (var i = 0; i < this.day.length; i++) {
+            if (i > 0) {
+              this.rowData.dayoff += ','
+            }
+            this.rowData.dayoff += this.day[i]
+          }
+          this.$emit('onModal', this.rowData)
+          this.$emit('update:dialogVisible', false)
           // this.resetForm(formName);
         } else {
-          console.log("error submit!!");
-          return false;
+          console.log('error submit!!')
+          return false
         }
-      });
+      })
     },
     /**
      * @description 取消/关闭按钮触发事件
      */
-    resetForm() {
-      this.$refs["rowData"].resetFields();
+    resetForm () {
+      this.$refs['rowData'].resetFields()
       // this.dialogVisible = false;
-      this.$emit("update:dialogVisible", false);
+      this.$emit('update:dialogVisible', false)
     },
     /**
      * 抽屉加入
      */
-    handleClose(done) {
+    handleClose (done) {
       if (this.loading) {
-        return;
+        return
       }
-      this.$confirm("确定要提交表单吗？")
+      this.$confirm('确定要提交表单吗？')
         .then((_) => {
-          this.loading = true;
+          this.loading = true
           this.timer = setTimeout(() => {
-            done();
+            done()
             // 动画关闭需要一定的时间
             setTimeout(() => {
-              this.loading = false;
-            }, 400);
-          }, 2000);
+              this.loading = false
+            }, 400)
+          }, 2000)
         })
-        .catch((_) => {});
+        .catch((_) => {})
     },
-    cancelForm() {
-      this.loading = false;
-      this.dialog = false;
-      clearTimeout(this.timer);
+    cancelForm () {
+      this.loading = false
+      this.dialog = false
+      clearTimeout(this.timer)
     },
-    choseUser() {
-      console.log("改变isChoseUser");
-      this.$emit("update:isChoseUser", true);
+    choseUser () {
+      console.log('改变isChoseUser')
+      this.$emit('update:isChoseUser', true)
       // console.log('改变dialogVisible1',dialogVisible1);
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

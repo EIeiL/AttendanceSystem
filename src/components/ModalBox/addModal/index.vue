@@ -25,7 +25,7 @@
         </span>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="primary" @click="submitForm" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
         <el-button @click="resetForm">取 消</el-button>
       </span>
     </el-dialog>
@@ -39,9 +39,9 @@ export default {
     formItem
   },
   props: {
-    dialogVisible: {  // 控制模态框是否显示 
+    dialogVisible: { // 控制模态框是否显示
       type: Boolean,
-      default: false,
+      default: false
     },
     msgOptions: { // 表单属性
       type: Array,
@@ -52,7 +52,7 @@ export default {
     },
     modalTitle: {
       type: String,
-      default: "添加"
+      default: '添加'
     },
     rowData: {
       type: Object,
@@ -63,13 +63,14 @@ export default {
   },
   data () {
     return {
-      formInline: {}
-    };
+      formInline: {},
+      loading: false
+    }
   },
   watch: {
     'rowData': {
       handler (val) {
-        console.log('val', val);
+        console.log('val', val)
         this.formInline = val
       },
       deep: true
@@ -78,23 +79,25 @@ export default {
   // model:{
   //   prop: 'modelValue',
   //   event: 'selectData'
-  // },  
+  // },
   methods: {
     /**
      * @description 添加按钮触发事件
      */
     submitForm () {
-      console.log('提交');
+      console.log('提交')
+      this.loading = true
       this.$refs['formInline'].validate((valid) => {
         if (valid) {
           console.log('校验成功！')
-          this.$emit("onModal", this.formInline)
-          this.resetForm ()
+          this.$emit('onModal', this.formInline)
+          this.loading = false
+          this.resetForm()
         } else {
-          console.log("校验失败！")
-          return false;
+          console.log('校验失败！')
+          return false
         }
-      });
+      })
     },
     /**
      * @description 取消/关闭按钮触发事件
@@ -102,9 +105,9 @@ export default {
     resetForm () {
       this.$refs['formInline'].resetFields()
       this.$emit('update:dialogVisible', false)
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

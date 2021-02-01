@@ -59,9 +59,6 @@
       v-bind="bindProps"
       clearable
       v-on="bindEvents"
-      format="yyyy-MM-dd HH:mm:ss"
-      value-format="yyyy-MM-dd HH:mm:ss"
-      :picker-options="pickerOptions0"
     >
     </el-date-picker>
 
@@ -101,6 +98,7 @@
       v-model="currentVal"
       v-bind="bindProps"
       v-on="bindEvents"
+      @keyup.enter.native="returnEvent"
       clearable
     ></el-input>
 
@@ -126,12 +124,7 @@ export default {
   },
   data () {
     return {
-      pickerOptions1: picker.pickerOptions,
-      pickerOptions0: { // 如何动态选择？
-        disabledDate (time) {
-          return time.getTime() > Date.now() - 8.64e6;//如果没有后面的-8.64e6就是不可以选择今天的
-        }
-      },
+      pickerOptions1: picker.pickerOptions
     }
   },
   computed: {
@@ -219,9 +212,15 @@ export default {
      */
     isText () {
       return this.itemOptions.element === 'el-text'
-    },
+    }
   },
   methods: {
+    /**
+     * @description 输入框回车回传事件
+     */
+    returnEvent () {
+      this.$emit('returnEvent')
+    }
   }
 }
 </script>

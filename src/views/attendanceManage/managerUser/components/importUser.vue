@@ -14,28 +14,29 @@
           class="demo-fileList"
           :rules="rules"
         >
-          <el-form-item label="选择文件" prop="name">
+          <el-form-item label="选择文件" prop="file">
             <el-upload
               class="upload-demo"
-              action="https://jsonplaceholder.typicode.com/posts/"
+              ref="upload"
+              :limit="1"
+              :action="doUpload"
               :on-preview="handlePreview"
               :on-remove="handleRemove"
-              :before-remove="beforeRemove"
-              multiple
-              :limit="3"
-              :on-exceed="handleExceed"
               :file-list="fileList"
+              :auto-upload="false"
             >
-              <el-button size="small" type="primary">点击上传</el-button>
-              <!-- <div slot="tip" class="el-upload__tip">
-                  只能上传jpg/png文件，且不超过500kb
-                </div> -->
+              <el-button slot="trigger" size="small" type="primary"
+                >选取文件</el-button
+              >
+              <div slot="tip" class="el-upload__tip">
+                只能上传xls文件，且数量不能大于1
+              </div>
             </el-upload>
           </el-form-item>
         </el-form>
       </span>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">添 加</el-button>
+        <el-button type="primary" @click="submitUpload">添 加</el-button>
         <el-button @click="resetForm">取 消</el-button>
       </span>
     </el-dialog>
@@ -45,34 +46,23 @@
 <script>
 export default {
   props: {
-    dialogVisible1: {
-      // 控制模态框是否显示
+    dialogVisible1: { // 控制模态框是否显示
       type: Boolean,
       default () {
-        return false;
-      },
+        return false
+      }
     }
   },
   data () {
     return {
-      rules: {
-        name: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' }
+      doUpload: '/attendance/users/importUser', // 上传文件接口
+      rules: { // 校验规则
+        file: [
+          { required: true, message: '请选择文件', trigger: 'blur' }
         ]
       },
-      fileList: [
-        {
-          name: "food.jpeg",
-          url:
-            "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
-        },
-        {
-          name: "food2.jpeg",
-          url:
-            "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
-        },
-      ],
-    };
+      fileList: [] // 上传文件列表
+    }
   },
   methods: {
     /**
@@ -82,44 +72,49 @@ export default {
       this.$refs['fileList'].validate((valid) => {
         if (valid) {
           // alert("submit!");
-          console.log("this.user", this.fileList);
+          // console.log('this.user', this.fileList)
           // console.log('formName',formName);
-          this.$emit("onModal1", this.fileList);
-          this.$emit("update:dialogVisible1", false);
+          this.$emit('onModal1', this.fileList)
+          this.$emit('update:dialogVisible1', false)
           // this.resetForm(formName);
         } else {
-          console.log("error submit!!");
-          return false;
+          console.log('error submit!!')
+          return false
         }
-      });
+      })
     },
     /**
      * @description 取消/关闭按钮触发事件
      */
-    resetForm (formName) {
-      this.$refs['fileList'].resetFields();
+    resetForm () {
+      // this.$refs['fileList'].resetFields()
       // this.dialogVisible = false;
-      this.$emit("update:dialogVisible1", false);
+      this.fileList = []
+      this.$emit('update:dialogVisible1', false)
     },
-
-
+    /**
+     * @description 是否在选取文件后立即进行上传
+     */
+    submitUpload () {
+      this.$refs.upload.submit()
+      this.fileList = []
+      this.$emit('update:dialogVisible1', false)
+      this.$emit('onModal1')
+    },
+    /**
+     * @description 文件列表移除文件时的钩子
+     */
     handleRemove (file, fileList) {
-      console.log(file, fileList);
+      console.log(file, fileList)
     },
+    /**
+     * @description 点击文件列表中已上传的文件时的钩子
+     */
     handlePreview (file) {
-      console.log(file);
-    },
-    handleExceed (files, fileList) {
-      this.$message.warning(
-        `当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length
-        } 个文件`
-      );
-    },
-    beforeRemove (file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`);
-    },
-  },
-};
+      console.log(file)
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

@@ -114,4 +114,3 @@ export function get2 (url, params = {}) {
       })
   })
 }
-

@@ -13,7 +13,7 @@
         :label="item.label ? item.label + '：' : ''"
         :rules="item.rules"
       >
-        <formItem v-model="formInline[item.prop]" :item-options="item" />
+        <formItem v-model="formInline[item.prop]" :item-options="item" @returnEvent="onSearch"/>
       </el-form-item>
     </span>
 
@@ -93,7 +93,7 @@ export default {
 
   data () {
     return {
-      formInline: {},
+      formInline: {}
     }
   },
 
@@ -112,19 +112,16 @@ export default {
      * @description 搜索
      */
     onSearch () {
-
       this.onValidate(() => {
-        
         this.$emit('onSearch', this.formInline)
-        // console.log(this.formInline);
       })
     },
     /**
      * @description 重置
      */
     onReset () {
-      // console.log(this.$refs['formRef'].resetFields());
       this.$refs.formRef.resetFields()
+      this.$emit('currPage', 1)
     },
     /**
      * @description 添加初始值
@@ -142,7 +139,6 @@ export default {
      * @description  工具按钮返回值
      */
     onSubmit (val) {
-      // console.log(val);
       this.onValidate(() => {
         this.$emit('toolsBtn', val)
       })

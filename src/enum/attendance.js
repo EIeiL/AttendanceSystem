@@ -11,7 +11,9 @@ export const myAttendance = {
     }, {
       label: '考勤时间',
       prop: 'queryTime',
-      element: 'el-date-picker1'
+      element: 'el-date-picker1',
+      format: 'yyyy-MM-dd HH:mm:ss',
+      valueFormat: 'yyyy-MM-dd HH:mm:ss'
     }, {
       prop: 'query',
       element: 'el-input',
@@ -31,15 +33,15 @@ export const myAttendance = {
     {
       prop: 'userName',
       label: '用户姓名',
-      operate: '',
+      operate: ''
     }, {
       prop: 'signTime',
       label: '考勤时间',
-      operate: '',
+      operate: ''
     }, {
       prop: 'signInStatusName',
       label: '签到状态',
-      operate: '',
+      operate: ''
     }, {
       prop: 'signOutStatusName',
       label: '签退状态',
@@ -49,28 +51,35 @@ export const myAttendance = {
   // 模态框表单属性
   modalOptions: [
     {
-      label: "用户姓名",
-      prop: "userId",
-      element: "el-select",
-      placeholder: "请选择用户姓名",
+      label: '用户姓名',
+      prop: 'userId',
+      element: 'el-select',
+      placeholder: '请选择用户姓名',
       rules: [
-        { required: true, message: "请选择用户姓名", trigger: "blur" },
+        { required: true, message: '请选择用户姓名', trigger: 'blur' }
       ],
-      options: [
-      ],
+      options: [],
+      filterable: true
     },
     {
-      label: "考勤时间",
-      prop: "signTime",
-      element: "el-date-picker",
+      label: '考勤时间',
+      prop: 'signTime',
+      element: 'el-date-picker',
       rules: [
-        { required: true, message: "请选择考勤时间", trigger: "blur" },
-      ]
+        { required: true, message: '请选择考勤时间', trigger: 'blur' }
+      ],
+      pickerOptions: { // 如何动态选择？
+        disabledDate (time) {
+          return time.getTime() > Date.now() - 8.64e6// 如果没有后面的-8.64e6就是不可以选择今天的
+        }
+      },
+      format: 'yyyy-MM-dd HH:mm:ss',
+      valueFormat: 'yyyy-MM-dd HH:mm:ss'
     }, {
-      label: "",
-      element: "el-text",
-      placeholder: "注:本次的打卡时间不得早于之前的打卡时间",
-      class: "tipText"
+      label: '',
+      element: 'el-text',
+      placeholder: '注:本次的打卡时间不得早于之前的打卡时间',
+      class: 'tipText'
     }
   ]
 }
@@ -90,7 +99,8 @@ export const managerUser = {
       }, {
         label: '联系电话',
         value: '3'
-      }]
+      }],
+      vValue: '1'
     }, {
       prop: 'content',
       element: 'el-input',
@@ -112,20 +122,20 @@ export const managerUser = {
       prop: 'id',
       label: '序号',
       sortable: true,
-      operate: '',
+      operate: ''
     }, {
       prop: 'username',
       label: '用户姓名',
-      operate: '',
+      operate: ''
     }, {
       prop: 'telephone',
       label: '联系电话',
-      operate: '',
+      operate: ''
     }, {
       prop: 'createTime',
       label: '添加时间',
       sortable: true,
-      operate: '',
+      operate: ''
     },
     {
       label: '操作',
@@ -134,30 +144,31 @@ export const managerUser = {
   ],
   msgOptions: [
     {
-      label: "用户姓名",
-      prop: "username",
-      element: "el-input",
-      placeholder: "请输入用户姓名",
+      label: '用户姓名',
+      prop: 'username',
+      element: 'el-input',
+      placeholder: '请输入用户姓名',
       rules: [
-        { required: true, message: "请输入用户姓名", trigger: "blur" },
+        { required: true, message: '请输入用户姓名', trigger: 'blur' },
         { min: 2, max: 5, message: '长度在 2 到 5 个字符' },
         { pattern: /^[\u4E00-\u9FA5]+$/, message: '用户名只能为中文' }
       ]
     }, {
-      label: "联系电话",
-      prop: "telephone",
-      element: "el-input",
-      placeholder: "请输入联系电话",
+      label: '联系电话',
+      prop: 'telephone',
+      element: 'el-input',
+      placeholder: '请输入联系电话',
       rules: [
-        { required: true, message: "请输入电话号码", trigger: "blur" },
+        { required: true, message: '请输入电话号码', trigger: 'blur' },
         {
           validator: function (rule, value, callback) {
-            if (/^1[34578]\d{9}$/.test(value) == false) {
-              callback(new Error("请输入有效的电话号码"));
+            if (/^1[34578]\d{9}$/.test(value) === false) {
+              callback(new Error('请输入有效的电话号码'))
             } else {
-              callback();
+              callback()
             }
-          }, trigger: 'blur'
+          },
+          trigger: 'blur'
         }
       ]
     }
@@ -167,7 +178,7 @@ export const managerUser = {
 export const attendanceStatus = {
   formOptions: [{
     label: '状态名称',
-    prop: 'status',
+    prop: 'name',
     element: 'el-select',
     placeholder: '请选择状态名称',
     options: [{
@@ -198,15 +209,15 @@ export const attendanceStatus = {
     {
       prop: 'id',
       label: '序号',
-      operate: '',
+      operate: ''
     }, {
       prop: 'name',
       label: '状态名称',
-      operate: '',
+      operate: ''
     }, {
       prop: 'rule',
       label: '规则设置',
-      operate: '',
+      operate: ''
     }, {
       prop: 'createTime',
       label: '添加时间',
@@ -214,7 +225,7 @@ export const attendanceStatus = {
       operate: ''
     }, {
       label: '操作',
-      operate: 'delete',
+      operate: 'delete'
     }
   ]
 }
@@ -228,16 +239,16 @@ export const attendanceGroup = {
     {
       prop: 'name',
       label: '考勤组名称',
-      operate: '',
+      operate: ''
     }, {
       prop: 'peopleSize',
       label: '考勤人数',
       sortable: true,
-      operate: '',
+      operate: ''
     }, {
       prop: 'type',
       label: '类型',
-      operate: '',
+      operate: ''
     }, {
       prop: 'attendanceTime',
       label: '考勤时间',

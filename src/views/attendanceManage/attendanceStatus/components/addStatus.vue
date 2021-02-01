@@ -9,14 +9,18 @@
       <span>
         <!-- 这是一段信息 -->
         <el-form
-          :model="status"
+          :model="formItem"
           :rules="rules"
-          ref="status"
+          ref="formItem"
           label-width="100px"
           class="demo-status"
         >
-          <el-form-item label="状态名称:" prop="name">
-            <el-select v-model="value1" placeholder="请选择">
+          <el-form-item label="状态名称:" prop="value">
+            <el-select
+              v-model="formItem.value"
+              placeholder="请选择"
+              @change="changeNum"
+            >
               <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -26,59 +30,59 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="规则设置:" prop="time" required>
-            <span v-if="num == 0"
-              >在<el-time-select
-                v-model="status.time"
+          <el-form-item label="规则设置:" prop="time" ref="timeItem">
+            <span v-if="num === '签到正常' || num === '早退'"
+              >在<el-time-picker
+                v-model="formItem.time"
                 :picker-options="{
-                  start: '08:30',
-                  step: '00:15',
-                  end: '18:30',
+                  selectableRange: '08:30:00 - 20:30:00',
                 }"
+                format="HH:mm:ss"
+                valueFormat="HH:mm:ss"
                 placeholder="  时间段"
               >
-              </el-time-select
+              </el-time-picker
               >之前打卡</span
             >
-            <span v-if="num == 1"
-              >在<el-time-select
-                v-model="status.time"
+            <span v-if="num === '迟到转事假' || num === '签退正常'"
+              >在<el-time-picker
+                v-model="formItem.time"
                 :picker-options="{
-                  start: '08:30',
-                  step: '00:15',
-                  end: '18:30',
+                  selectableRange: '08:30:00 - 20:30:00',
                 }"
+                format="HH:mm:ss"
+                valueFormat="HH:mm:ss"
                 placeholder="  时间段"
               >
-              </el-time-select
+              </el-time-picker
               >以后打卡</span
             >
-            <span v-if="num == 2"
-              >在<el-time-select
+            <span v-if="num === '迟到'"
+              >在<el-time-picker
                 placeholder="开始时间段"
                 v-model="startTime"
+                format="HH:mm:ss"
+                valueFormat="HH:mm:ss"
                 :picker-options="{
-                  start: '08:30',
-                  step: '00:15',
-                  end: '18:30',
+                  selectableRange: '08:30:00 - 20:30:00',
                 }"
               >
-              </el-time-select
+              </el-time-picker
               >至
-              <el-time-select
+              <el-time-picker
                 placeholder="结束时间段"
                 v-model="endTime"
+                format="HH:mm:ss"
+                valueFormat="HH:mm:ss"
                 :picker-options="{
-                  start: '08:30',
-                  step: '00:15',
-                  end: '18:30',
-                  minTime: startTime,
+                  selectableRange: '08:30:00 - 20:30:00',
                 }"
               >
-              </el-time-select
+              </el-time-picker
               >之间打卡</span
             >
-            <span v-if="num == 3">无打卡记录</span>
+            <span v-if="num === '缺卡'">无打卡记录</span>
+            <span else></span>
           </el-form-item>
         </el-form>
       </span>
@@ -97,80 +101,90 @@ export default {
     dialogVisible: {
       // 控制模态框是否显示
       type: Boolean,
-      default: false,
+      default: false
     },
     modalTitle: {
       type: String,
       default () {
-        return "添加考勤记录";
-      },
-    },
+        return '添加考勤记录'
+      }
+    }
   },
   data () {
     return {
-      value: {},
-      value1: '',
       options: [{
-        value: '选项1',
-        label: '黄金糕'
+        value: '签到正常',
+        label: '签到正常'
       }, {
-        value: '选项2',
-        label: '双皮奶'
+        value: '迟到',
+        label: '迟到'
       }, {
-        value: '选项3',
-        label: '蚵仔煎'
+        value: '早退',
+        label: '早退'
       }, {
-        value: '选项4',
-        label: '龙须面'
+        value: '迟到转事假',
+        label: '迟到转事假'
       }, {
-        value: '选项5',
-        label: '北京烤鸭'
+        value: '签退正常',
+        label: '签退正常'
+      }, {
+        value: '缺卡',
+        label: '缺卡'
       }],
-      num: 2,
+      num: '',
       startTime: '',
       endTime: '',
-      status: { name: "", phone: "", time: "" },
+      formItem: { value: '', time: '' },
       rules: {
         // 校验规则
-        name: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          // { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
+        value: [
+          { required: true, message: '请选择', trigger: 'blur' }
         ],
-        phone: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
-        ],
-      },
-      value: new Date(),
-    };
+        time: []
+      }
+    }
   },
   methods: {
     /**
      * @description 添加按钮触发事件
      */
     submitForm () {
-      this.$refs["status"].validate((valid) => {
+      if (this.formItem.time === '' && this.num !== '缺卡') {
+        this.formItem.time = this.startTime + '-' + this.endTime
+      }
+      this.$refs['formItem'].validate((valid) => {
         if (valid) {
-          // console.log("this.group", this.group);
-          this.$emit("onModal", this.status);
-          this.$emit("update:dialogVisible", false);
-          // this.resetForm(formName);
+          // console.log('this.formItem', this.formItem)
+          const form = JSON.parse(JSON.stringify(this.formItem))
+          console.log('form', form)
+          this.$emit('onModal', form)
+          this.resetForm()
         } else {
-          console.log("error submit!!");
-          return false;
+          console.log('error submit!!')
+          return false
         }
-      });
+      })
     },
     /**
      * @description 取消/关闭按钮触发事件
      */
-    resetForm () {
-      this.$refs["status"].resetFields();
-      // this.dialogVisible = false;
-      this.$emit("update:dialogVisible", false);
+    async resetForm () {
+      await this.$refs['formItem'].resetFields()
+      this.$emit('update:dialogVisible', false)
     },
-  },
-};
+    /**
+     * @description 下拉框value值改变触发事件
+     */
+    changeNum (val) {
+      this.num = val
+      if (this.num === '缺卡') {
+        this.rules.time = []
+      } else {
+        this.rules.time = [{ required: true, message: '请输入时间', trigger: 'blur' }]
+      }
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

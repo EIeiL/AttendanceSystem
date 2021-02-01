@@ -9,6 +9,7 @@
       :form-options="formOptions"
       @onSearch="onSearch"
       @toolsBtn="toolsBtn"
+      @currPage="currPage"
     />
     <!-- 表格+分页 -->
     <attendance-table
@@ -18,6 +19,7 @@
       :count="count"
       @pageSize="pageSize"
       @currPage="currPage"
+      v-loading="loading"
     />
     <!-- 模态框 -->
     <add-modal
@@ -31,39 +33,40 @@
 
 <script>
 // 通用组件 -- 当前位置、表单、表格+分页、添加模态框
-import Current from "@/components/NowLocation/index";
-import AttendanceForm from "@/components/QueryForm/index";
-import AttendanceTable from "@/components/DataTable/index";
-import AddModal from "@/components/ModalBox/addModal/index";
+import Current from '@/components/NowLocation/index'
+import AttendanceForm from '@/components/QueryForm/index'
+import AttendanceTable from '@/components/DataTable/index'
+import AddModal from '@/components/ModalBox/addModal/index'
 
 // js文件 -- 传入组件内容、日期格式化
-import { myAttendance } from "@/enum/attendance";
-import formatDate from "@/utils/formatDate"
+import { myAttendance } from '@/enum/attendance'
+import formatDate from '@/utils/formatDate'
 
 export default {
   components: {
     Current, // 当前位置
     AttendanceForm, // 表单
     AttendanceTable, // 表格+分页
-    AddModal  // 模态框
+    AddModal // 模态框
   },
   data () {
     return {
-      modalTitle: "", // 模态框标题
+      modalTitle: '添加考勤记录', // 模态框标题
       dialogVisible: false, // 模态框是否显示
       formOptions: myAttendance.formOptions, // 表单属性
       btnTools: myAttendance.btnTools, // 工具按钮属性
       columnOptions: myAttendance.columnOptions, // 列属性
-      msgOptions: myAttendance.modalOptions,  // 模态框属性
+      msgOptions: myAttendance.modalOptions, // 模态框属性
       tableData: [], // 页面显示数据 -- 表格
       userData: [], // 模态框下拉框数据 -- 用户选择
-      statusData: [],// 搜索表单下拉框数据 -- 状态选择
-      searchParam: {  // 分页相关
+      statusData: [], // 搜索表单下拉框数据 -- 状态选择
+      searchParam: { // 分页相关
         currPage: 1,
-        pageSize: 10,
+        pageSize: 10
       },
       count: 0, // 总的数据条数
-    };
+      loading: false // 是否加载
+    }
   },
   created () {
     this.getAttendanceList(1)
@@ -98,8 +101,7 @@ export default {
      * @description 工具按钮返回内容
      */
     toolsBtn (val) {
-      this.modalTitle = "添加考勤记录"
-      this.dialogVisible = true;
+      this.dialogVisible = true
     },
     /**
      * @description 模态框返回内容（点击确定按钮触发）
@@ -109,7 +111,7 @@ export default {
         ...val
       })
       // console.log('res', res)
-      if (res.code == 0) {
+      if (res.code === 0) {
         this.getAttendanceList(1)
       }
     },
@@ -134,12 +136,12 @@ export default {
     async getUserList () {
       const res = await this.$request.getMyUser({
       })
-      console.log('用户res', res)
-      if (res.code == 0) {
+      // console.log('用户res', res)
+      if (res.code === 0) {
         for (var i = 0; i < res.data.length; i++) {
           const user = {
             label: res.data[i].username,
-            value: res.data[i].id,
+            value: res.data[i].id
           }
           this.$set(this.msgOptions[0].options, i, user)
         }
@@ -151,13 +153,13 @@ export default {
     async getStatusList () {
       const res = await this.$request.getStatus({
       })
-      console.log('状态res', res)
-      if (res.code == 0) {
-        console.log('打印状态信息', res.data.list);
+      // console.log('状态res', res)
+      if (res.code === 0) {
+        // console.log('打印状态信息', res.data.list)
         for (var i = 0; i < res.data.list.length; i++) {
           const status = {
             label: res.data.list[i].name,
-            value: res.data.list[i].id,
+            value: res.data.list[i].name
           }
           this.$set(this.formOptions[0].options, i, status)
         }
@@ -167,14 +169,13 @@ export default {
      * @description 获取考勤数据
      */
     async getAttendanceList (page) {
+      this.loading = true
       this.searchParam.currPage = page
       const res = await this.$request.getMyattendance({
         ...this.searchParam
       })
-      console.log('考勤res', res)
-      if (res.code == 0 && res.data.list && res.data.total) {
-        // this.loading = false
-        this.count = res.data.total
+      // console.log('考勤res', res)
+      if (res.code === 0) {
         const tableDataTemp = []
         for (var i = 0; i < res.data.list.length; i++) {
           const obj = {
@@ -185,11 +186,18 @@ export default {
           }
           this.$set(tableDataTemp, i, obj)
         }
-        this.tableData = tableDataTemp
+        if (res.data.total > 0) {
+          this.count = res.data.total
+          this.tableData = tableDataTemp
+        } else {
+          this.count = 0
+          this.tableData = []
+        }
       }
-    },
-  },
-};
+      this.loading = false
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

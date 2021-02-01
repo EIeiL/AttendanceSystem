@@ -54,8 +54,6 @@ export const delUser = (params = {}) => {
   })
 }
 
-
-
 // 考勤状态管理 -- 获取数据列表（搜索）
 export const getStatus = (params = {}) => {
   return https.post(INTF.attendance_getStatus, params).then(res => {
@@ -75,7 +73,6 @@ export const delStatus = (params = {}) => {
   })
 }
 
-
 // 考勤组管理 -- 获取数据列表
 export const getGroup = (params = {}) => {
   return https.post(INTF.attendance_getGroup, params).then(res => {
@@ -91,6 +88,12 @@ export const addGroup = (params = {}) => {
 // 考勤组管理 -- 删除考勤组
 export const delGroup = (params = {}) => {
   return https.post(INTF.attendance_delGroup, params).then(res => {
+    return res
+  })
+}
+// 考勤组管理 -- 该用户是否存在其他组
+export const isOtherGroup = (params = {}) => {
+  return https.post(INTF.attendance_isOtherGroup, params).then(res => {
     return res
   })
 }

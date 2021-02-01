@@ -36,7 +36,7 @@
                   :key="index"
                   @click="delUser"
                 >
-                  {{ item }} <span class="red-icon">X</span>
+                  {{ item.username }} <span class="red-icon">X</span>
                 </el-button>
               </div>
             </el-form-item></span
@@ -58,80 +58,87 @@ export default {
     isChoseUser: {
       // 控制模态框是否显示
       type: Boolean,
-      default: false,
+      default: false
     },
+    choseUsers: {
+      // 控制模态框是否显示
+      type: Array,
+      default () {
+        return []
+      }
+    }
   },
-  data() {
+  data () {
     return {
       count: 0,
       counts: [], // 所有人员名单
       users: [],
-      search: "", // 输入框内容
-      checkd: [], // 选中人员名单
-      chose: {}, // 表单绑定 目前无用
-    };
+      search: '', // 输入框内容
+      checkd: this.choseUsers, // 选中人员名单
+      chose: {} // 表单绑定 目前无用
+    }
   },
   watch: {
     search: {
-      handler(val) {
-        this.users = [];
+      handler (val) {
+        this.users = []
         for (var i = 0; i < this.counts.length; i++) {
-          if (this.search == this.counts[i].username) {
-            this.users.push(this.counts[i]);
+          if (this.search === this.counts[i].username) {
+            this.users.push(this.counts[i])
           }
         }
-      },
+      }
       // deep: true
-    },
+    }
   },
-  created() {
-    this.getUserList();
+  created () {
+    this.getUserList()
   },
   methods: {
     /**
      * @description 加载姓名列表
      */
-    load() {
+    load () {
       if (this.count < this.counts.length) {
-        this.count += 1;
+        this.count += 1
       }
     },
     /**
      * @description 获取用户列表
      */
-    async getUserList() {
-      const res = await this.$request.getMyUser({});
+    async getUserList () {
+      const res = await this.$request.getMyUser({})
       // console.log('res', res)
-      if (res.code == 0 && res.data.length > 0) {
-        this.counts = res.data;
-        this.users = this.counts;
+      if (res.code === 0 && res.data.length > 0) {
+        this.counts = res.data
+        this.users = this.counts
       }
     },
     /**
      * @description 添加按钮触发事件
      */
-    submitForm() {
-      this.$emit("onModal1", this.checkd);
-      this.resetForm();
+    submitForm () {
+      this.$emit('onModal1', this.checkd)
+      this.resetForm()
     },
     /**
      * @description 取消/关闭按钮触发事件
      */
-    resetForm() {
+    resetForm () {
       // this.$refs["chose"].resetFields();
-      this.search = "";
-      this.checkd = [];
-      this.$emit("update:isChoseUser", false);
+      this.search = ''
+      // this.checkd = []
+      this.$emit('update:isChoseUser', false)
     },
     /**
      * @description 删除选中人员
      */
-    delUser(val) {
+    delUser (val) {
       // console.log("删除人员：", val);
-      this.checkd.splice(val, 1);
-    },
-  },
-};
+      this.checkd.splice(val, 1)
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

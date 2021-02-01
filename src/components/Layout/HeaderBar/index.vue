@@ -20,17 +20,23 @@ export default {
     return {
       activeIndex: '3',
       toPageName: ['First', 'System', 'Home']
-    };
+    }
+  },
+  created () {
+    if (this.$route.name === 'First') {
+      this.activeIndex = '1'
+    } else if (this.$route.name === 'System') {
+      this.activeIndex = '2'
+    } else {
+      this.activeIndex = '3'
+    }
   },
   methods: {
     handleSelect (key, keyPath) {
-      // console.log(key, keyPath)
-      this.activeIndex = key
+      this.activeIndex = key + ''
       this.$router.push({
         name: this.toPageName[key - 1]
       }).catch(() => {
-        // console.log('跳转至', this.toPageName[key-1])
-        
       })
     }
   }

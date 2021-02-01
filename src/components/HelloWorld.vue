@@ -10,13 +10,13 @@
 </template>
 
 <script>
-  import HeaderBar from '@/components/Layout/HeaderBar/index'
-  export default {
-    name: 'HelloWorld',
-    components: {
-      HeaderBar
-    }
+import HeaderBar from '@/components/Layout/HeaderBar/index'
+export default {
+  name: 'HelloWorld',
+  components: {
+    HeaderBar
   }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

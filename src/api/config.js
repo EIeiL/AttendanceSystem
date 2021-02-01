@@ -17,7 +17,7 @@ export default {
 
       // 考勤状态管理
       attendance_getStatus: '/attendance/status/listStatus',
-      attendance_addStatus: '',
+      attendance_addStatus: '/attendance/status/addStatus',
       // attendance_editStatus: '',
       attendance_delStatus: '/attendance/status/deleteStatus',
 
@@ -25,6 +25,7 @@ export default {
       attendance_getGroup: '/attendance/group/list',
       attendance_addGroup: '/attendance/group/save',
       attendance_delGroup: '/attendance/group/deleteGroup',
+      attendance_isOtherGroup: '/attendance/group/findOtherData'
     }
 
     // 信息配置中心
