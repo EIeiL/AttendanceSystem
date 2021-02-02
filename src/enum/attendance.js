@@ -246,7 +246,7 @@ export const attendanceGroup = {
       sortable: true,
       operate: ''
     }, {
-      prop: 'type',
+      prop: 'typeString',
       label: '类型',
       operate: ''
     }, {

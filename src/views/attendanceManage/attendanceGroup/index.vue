@@ -200,10 +200,6 @@ export default {
       console.log('this.userids', this.userIds)
       this.modalTitle = '编辑考勤组'
       this.dialogVisible = true
-      // this.rowUser = []
-      // for (var i = 0; i < this.rowData.users.length; i++) {
-      //   this.rowUser.push(this.rowData.users[i].username)
-      // }
     },
     /**
      * @description 选择每页数据条数返回内容
@@ -231,9 +227,18 @@ export default {
       })
       // console.log('获取考勤组数据', res)
       if (res.code === 0) {
+        const tableDataTemp = []
+        for (var i = 0; i < res.data.list.length; i++) {
+          const obj = {
+            ...res.data.list[i],
+            typeString: res.data.list[i].type === 0 ? '固定班制' : '大小周制'
+          }
+          this.$set(tableDataTemp, i, obj)
+        }
+        
         if (res.data.total > 0) {
           this.count = res.data.total
-          this.tableData = res.data.list
+          this.tableData = tableDataTemp
         } else {
           this.count = 0
           this.tableData = []

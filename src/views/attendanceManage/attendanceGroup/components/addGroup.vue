@@ -18,7 +18,7 @@
           <el-form-item label="考勤组名称：" prop="name">
             <el-input v-model="rowData.name"></el-input>
           </el-form-item>
-          <el-form-item label="参与考勤人员：">
+          <el-form-item label="参与考勤人员：" prop="people">
             <el-button size="small" v-if="userIds > 0" @click="choseUser"
               >共 {{ userIds }} 人
             </el-button>
@@ -26,7 +26,7 @@
               >请选择 >
             </el-button>
           </el-form-item>
-          <el-form-item label="考勤组名称：" prop="day">
+          <el-form-item label="考勤组名称：" prop="type">
             <el-radio-group
               v-model="rowData.type"
               @change="dayArr = rowData.type === 0 ? [6, 7] : [7]"
@@ -40,31 +40,26 @@
               >
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="考勤时间段：">
+          <el-form-item label="考勤时间段：" prop="time">
             <span>9:00-12:30，14:00-18:00</span>
           </el-form-item>
           <el-form-item
             label="休息日选择："
-            prop="day"
             class="del-marginBottom"
+            prop="dayArray"
           >
             <el-checkbox-group
               v-model="dayArr"
-              prop="day"
+              :min="1"
+              @change="rowData.type = JSON.stringify(dayArr) === JSON.stringify([ 6,7 ]) ? 0 : 1"
             >
               <el-checkbox :label="1" disabled>周一</el-checkbox>
               <el-checkbox :label="2" disabled>周二</el-checkbox>
               <el-checkbox :label="3" disabled>周三</el-checkbox>
               <el-checkbox :label="4" disabled>周四</el-checkbox>
               <el-checkbox :label="5" disabled>周五</el-checkbox>
-              <el-checkbox :label="6" disabled v-if="rowData.type === 0"
-                >周六</el-checkbox
-              >
-              <el-checkbox :label="6" v-else>周六</el-checkbox>
-              <el-checkbox :label="7" disabled v-if="rowData.type === 0"
-                >周日</el-checkbox
-              >
-              <el-checkbox :label="7" v-else>周日</el-checkbox>
+              <el-checkbox :label="6">周六</el-checkbox>
+              <el-checkbox :label="7">周日</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
           <el-calendar v-model="value" class="attendance-calendar">
@@ -76,18 +71,18 @@
               </p>
             </template>
           </el-calendar>
-          <el-form-item label="考勤状态设置：" prop="day">
+          <el-form-item label="考勤状态设置：" prop="setting">
             <span>根据已设置好的考勤状态执行。</span>
           </el-form-item>
         </el-form>
         <div class="demo-drawer__footer">
-          <!-- <el-button
+          <el-button
             type="primary"
-            @click="$refs.drawer.closeDrawer()"
+            @click="submitForm"
             :loading="loading"
             >{{ loading ? "提交中 ..." : "添 加" }}</el-button
-          > -->
-          <el-button type="primary" @click="submitForm">添 加</el-button>
+          >
+          <!-- <el-button type="primary" @click="submitForm">添 加</el-button> -->
           <el-button @click="resetForm">取 消</el-button>
         </div>
       </div>
@@ -130,7 +125,7 @@ export default {
       handler (val) {
         console.log('val', val)
         this.group = val
-        this.dayArr = [6]
+        // this.dayArr = [6]
         if (this.rowData.dayoff) {
           const day = this.rowData.dayoff.split(',')
           for (var i = 0; i < day.length; i++) {
@@ -146,14 +141,24 @@ export default {
     return {
       timer: null,
       loading: false,
-      dayArr: [6],
+      dayArr: [7],
       group: { day: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] },
       rules: {
         // 校验规则
         name: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-        ]
+          { required: true, message: '请输入考勤组名称', trigger: 'blur' },
+          { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' },
+          { pattern: /^[\u4e00-\u9fa5A-Za-z]+$/, message: '考勤组名称只能为中英文' }
+        ],
+        type: [
+          { required: true, message: '请选择考勤类型', trigger: 'blur' }
+        ],
+        dayArray: [
+          { required: false, trigger: 'blur' }
+        ],
+        time: [{ required: false, trigger: 'blur' }],
+        people: [{ required: false, trigger: 'blur' }],
+        setting: [{ required: false, trigger: 'blur' }]
       },
       value: new Date(),
       dayTitle: ''
@@ -166,6 +171,7 @@ export default {
     submitForm () {
       this.$refs['rowData'].validate((valid) => {
         if (valid) {
+          this.loading = true
           console.log('this.group', this.group)
           this.rowData.dayoff = ''
           this.rowData.users = []
@@ -180,7 +186,8 @@ export default {
           } else {
             this.$emit('onModal', true)
           }
-          this.$emit('update:dialogVisible', false)
+          // this.$emit('update:dialogVisible', false)
+          setTimeout(this.loading = false, 5000)
         } else {
           console.log('error submit!!')
           return false
@@ -228,12 +235,12 @@ export default {
      */
     dealMyDate (data) {
       // console.log('day.type', data.type)
-      console.log('this.dayArr', this.dayArr)
+      // console.log('this.dayArr', JSON.stringify(this.dayArr) === JSON.stringify([ 6, 7 ]))
       const weekNum = this.getWeek(data.day)
       let res = ''
       if (this.rowData.type === 0 && (weekNum === '周六' || weekNum === '周日') && data.type === 'current-month') {
         res = 1
-      } else if (this.dayArr === [6] && data.type === 'current-month') {
+      } else if (JSON.stringify(this.dayArr) === JSON.stringify([ 6 ]) && data.type === 'current-month') {
         if (weekNum === '周六') {
           res = 2
         } else if (weekNum === '周日') {
@@ -243,7 +250,7 @@ export default {
             res = 3
           }
         }
-      } else if (this.dayArr === [7] && data.type === 'current-month') {
+      } else if (JSON.stringify(this.dayArr) === JSON.stringify([ 7 ]) && data.type === 'current-month') {
         if (weekNum === '周日') {
           res = 2
           // break
@@ -287,10 +294,10 @@ export default {
   width: 6px;
 }
 >>> .el-form-item {
-  margin-bottom: 15px;
+  margin-bottom: 8px;
 }
 >>> .el-calendar__body {
-  padding: 12px 20px 20px;
+  padding: 12px 20px 12px;
 }
 .del-marginBottom {
   margin-bottom: 0px;
@@ -301,7 +308,7 @@ export default {
   margin-left: 42px;
 }
 .demo-drawer__footer {
-  margin-left: 620px;
+  margin-left: 580px;
 }
 .is-selected {
   // color: #1989fa;
