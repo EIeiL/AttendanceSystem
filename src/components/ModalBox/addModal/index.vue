@@ -84,14 +84,14 @@ export default {
     /**
      * @description 添加按钮触发事件
      */
-    submitForm () { 
+    submitForm () {
       this.loading = true
       this.$refs['formInline'].validate((valid) => {
         if (valid) {
           console.log('校验成功！')
           this.$emit('onModal', this.formInline)
           this.loading = false
-          this.resetForm()
+          // this.resetForm()
         } else {
           console.log('校验失败！')
           this.loading = false

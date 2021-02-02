@@ -9,6 +9,7 @@
       @onSearch="onSearch"
       :btn-tools="btnTools"
       @toolsBtn="toolsBtn"
+      @currPage="currPage"
     />
     <!-- 表格+分页 -->
     <attendance-table
@@ -89,7 +90,7 @@ export default {
      */
     async onSearch (val) {
       this.loading = true
-      var res
+      var res = ''
       if (val.keywords === '1') {
         res = await this.$request.getUser({
           ...this.searchParam,
@@ -106,12 +107,13 @@ export default {
           telephone: val.content
         })
       } else {
-        res = await this.$request.getUser({
-          ...this.searchParam
+        this.$message({
+          type: 'success',
+          message: '请选择匹配字段'
         })
       }
       // console.log('搜索res', res)
-      if (res.code === 0) {
+      if (res !== '' && res.code === 0) {
         // console.log('搜索用户success')
         if (res.data.total > 0) {
           this.count = res.data.total
@@ -192,6 +194,11 @@ export default {
             message: '编辑成功'
           })
           this.getUserList(1)
+        } else {
+          this.$message({
+            type: 'info',
+            message: res.msg
+          })
         }
       } else {
         const res = await this.$request.addUser({
@@ -204,7 +211,13 @@ export default {
             type: 'info',
             message: '添加成功'
           })
+          this.dialogVisible = false
           this.getUserList(1)
+        } else {
+          this.$message({
+            type: 'info',
+            message: res.msg
+          })
         }
       }
     },
@@ -213,10 +226,12 @@ export default {
      */
     onModal1 (val) {
       // console.log('导入用户', val)
+      // setTimeout(this.getUserList(1), 500)
       this.$message({
         type: 'info',
-        message: '导入成功xx条，导入失败xx条'
+        message: '导入成功' + val.data.successCount + '条，导入失败' + val.data.errorCount + '条'
       })
+      this.dialogVisible1 = false
       this.getUserList(1)
     },
     /**

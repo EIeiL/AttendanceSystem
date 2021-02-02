@@ -25,11 +25,17 @@
     <addGroup-modal
       :dialogVisible.sync="dialogVisible"
       :modalTitle="modalTitle"
+      :userIds="userIds.length"
       :rowData="rowData"
       :isChoseUser.sync="isChoseUser"
       @onModal="onModal"
     />
-    <choseUser-modal :isChoseUser.sync="isChoseUser" :choseUsers.sync="rowData.users" @onModal1="onModal1" />
+    <choseUser-modal
+      :isChoseUser.sync="isChoseUser"
+      :choseUsers.sync="rowData.users"
+      :userIds.sync="userIds"
+      @onModal1="onModal1"
+    />
   </div>
 </template>
 
@@ -45,7 +51,6 @@ import ChoseUserModal from './components/choseUser'
 
 // js文件 -- 1传入组件内容、2深拷贝、3弹框
 import { attendanceGroup } from '@/enum/attendance'
-import deepCopy from '@/utils/deepCopy'
 import { openTip } from '@/utils/messageBox'
 
 export default {
@@ -59,6 +64,7 @@ export default {
   data () {
     return {
       rowData: {}, // 某行数据
+      userIds: [],
       dialogVisible: false, // 控制新增+编辑模态框是否显示
       isChoseUser: false, // 控制选择人员模态框是否显示
       modalTitle: '', // 模态框标题
@@ -86,7 +92,9 @@ export default {
     toolsBtn (val) {
       // console.log('点击添加考勤组按钮', val)
       this.modalTitle = '添加考勤组'
-      this.rowData = {}
+      this.rowData = {users: []}
+      console.log('this.rowData', this.rowData)
+      // this.rowUser = []
       this.dialogVisible = true
     },
     /**
@@ -94,25 +102,56 @@ export default {
      */
     async onModal (val) {
       console.log('新增+编辑模态框返回内容', val)
+      console.log('this.userIds', this.userIds)
+      // console.log('this.rowData', this.rowData)
+      var obj = {
+        name: this.rowData.name,
+        userIds: this.userIds,
+        type: this.rowData.type,
+        dayoff: this.rowData.dayoff
+      }
+      if (val === true) {
+        obj.id = this.rowData.id
+      }
       const res = await this.$request.addGroup({
-        ...this.rowData
+        // ...this.rowData
+        ...obj
       })
       // console.log('res', res)
       if (res.code === 0) {
         this.$message({
-          type: 'info',
-          message: '已取消删除'
+          type: 'success',
+          message: '添加成功'
         })
-        this.getAttendanceList(1)
+        this.rowData = {}
+        this.getGroupList(1)
       }
     },
     /**
      * @description 选择人员模态框返回内容
      */
-    onModal1 (val) {
+    async onModal1 (val) {
       // console.log('选择人员模态框', val)
       // this.rowData.users = val
-      console.log('rowData', this.rowData)
+      console.log('aaaarowData', this.rowData)
+      const id = this.rowData.id
+      const res = await this.$request.isOtherGroup({
+        id: id,
+        userIds: this.userIds
+      })
+      // console.log('获取考勤状态数据', res)
+      var tip = '用户'
+      for (var i = 0; i < res.data.userList.length; i++) {
+        if (i > 0) {
+          tip += '、'
+        }
+        tip += res.data.userList[i]
+        console.log(res.data.userList[i])
+      }
+      tip += '已存在其他考勤组，是否将用户加入本考勤组'
+      if (res.code === 0 && res.data.userList.length > 0) {
+        this.openTip(tip, '提示')
+      }
     },
     /**
      * @description 点击删除触发事件
@@ -142,15 +181,29 @@ export default {
      */
     onTableEdit (val) {
       // console.log('点击编辑', val)
-      var o
-      if (typeof val === 'object') {
-        o = deepCopy.copyObject(val)
-      } else {
-        o = val
+      console.log('拷贝val', val)
+      this.rowData.users = []
+      // var o
+      // if (typeof val === 'object') {
+      //   o = deepCopy.objDeepCopy(val)
+      // } else {
+      //   o = val
+      // }
+      const obj = JSON.parse(JSON.stringify(val))
+      obj.users = obj.users ? obj.users : []
+      this.rowData = obj
+      console.log('rowdata', this.rowData)
+      this.userIds = []
+      for (var i = 0; i < this.rowData.peopleSize; i++) {
+        this.userIds.push(this.rowData.users[i].id)
       }
-      this.rowData = o
+      console.log('this.userids', this.userIds)
       this.modalTitle = '编辑考勤组'
       this.dialogVisible = true
+      // this.rowUser = []
+      // for (var i = 0; i < this.rowData.users.length; i++) {
+      //   this.rowUser.push(this.rowData.users[i].username)
+      // }
     },
     /**
      * @description 选择每页数据条数返回内容

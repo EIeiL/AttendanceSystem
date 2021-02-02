@@ -22,6 +22,7 @@
               :action="doUpload"
               :on-preview="handlePreview"
               :on-remove="handleRemove"
+              :on-success="getRes"
               :file-list="fileList"
               :auto-upload="false"
             >
@@ -29,7 +30,7 @@
                 >选取文件</el-button
               >
               <div slot="tip" class="el-upload__tip">
-                只能上传xls文件，且数量不能大于1
+                只能上传xls文件
               </div>
             </el-upload>
           </el-form-item>
@@ -71,12 +72,8 @@ export default {
     submitForm () {
       this.$refs['fileList'].validate((valid) => {
         if (valid) {
-          // alert("submit!");
-          // console.log('this.user', this.fileList)
-          // console.log('formName',formName);
           this.$emit('onModal1', this.fileList)
           this.$emit('update:dialogVisible1', false)
-          // this.resetForm(formName);
         } else {
           console.log('error submit!!')
           return false
@@ -87,19 +84,18 @@ export default {
      * @description 取消/关闭按钮触发事件
      */
     resetForm () {
-      // this.$refs['fileList'].resetFields()
-      // this.dialogVisible = false;
       this.fileList = []
       this.$emit('update:dialogVisible1', false)
     },
     /**
      * @description 是否在选取文件后立即进行上传
      */
-    submitUpload () {
-      this.$refs.upload.submit()
-      this.fileList = []
-      this.$emit('update:dialogVisible1', false)
-      this.$emit('onModal1')
+    async submitUpload () {
+      await this.$refs.upload.submit()
+      // var res = this.$refs.upload.submit()
+      // console.log(res, 'res')
+      // this.fileList = []
+      // this.$emit('update:dialogVisible1', false)
     },
     /**
      * @description 文件列表移除文件时的钩子
@@ -112,6 +108,10 @@ export default {
      */
     handlePreview (file) {
       console.log(file)
+    },
+    getRes (response, file, fileList) {
+      console.log('response', response)
+      this.$emit('onModal1', response)
     }
   }
 }

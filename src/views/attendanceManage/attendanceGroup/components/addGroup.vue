@@ -19,21 +19,18 @@
             <el-input v-model="rowData.name"></el-input>
           </el-form-item>
           <el-form-item label="参与考勤人员：">
-            <el-button
-              size="small"
-              v-if="rowData.peopleSize > 0"
-              @click="choseUser"
-              >共 {{ rowData.peopleSize }} 人
+            <el-button size="small" v-if="userIds > 0" @click="choseUser"
+              >共 {{ userIds }} 人
             </el-button>
-            <el-button
-              size="small"
-              v-else
-              @click="choseUser"
+            <el-button size="small" v-else @click="choseUser"
               >请选择 >
             </el-button>
           </el-form-item>
           <el-form-item label="考勤组名称：" prop="day">
-            <el-radio-group v-model="rowData.type">
+            <el-radio-group
+              v-model="rowData.type"
+              @change="dayArr = rowData.type === 0 ? [6, 7] : [7]"
+            >
               <el-radio :label="0" value="0"
                 >固定班制（每天考勤时间一样，适用于固定上班时间制的员工）</el-radio
               >
@@ -51,17 +48,33 @@
             prop="day"
             class="del-marginBottom"
           >
-            <el-checkbox-group v-model="day" prop="day">
+            <el-checkbox-group
+              v-model="dayArr"
+              prop="day"
+            >
               <el-checkbox :label="1" disabled>周一</el-checkbox>
               <el-checkbox :label="2" disabled>周二</el-checkbox>
               <el-checkbox :label="3" disabled>周三</el-checkbox>
               <el-checkbox :label="4" disabled>周四</el-checkbox>
               <el-checkbox :label="5" disabled>周五</el-checkbox>
-              <el-checkbox :label="6">周六</el-checkbox>
-              <el-checkbox :label="7">周日</el-checkbox>
+              <el-checkbox :label="6" disabled v-if="rowData.type === 0"
+                >周六</el-checkbox
+              >
+              <el-checkbox :label="6" v-else>周六</el-checkbox>
+              <el-checkbox :label="7" disabled v-if="rowData.type === 0"
+                >周日</el-checkbox
+              >
+              <el-checkbox :label="7" v-else>周日</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
           <el-calendar v-model="value" class="attendance-calendar">
+            <template slot="dateCell" slot-scope="{ date, data }">
+              <p :class="dealMyDate(data) ? 'is-selected' : ''">
+                {{ data.day.split("-").slice(2).join("-") }}
+                <br />
+                {{ (dayTitle = dealMyDate(data) ? "放假" : "上班") }}
+              </p>
+            </template>
           </el-calendar>
           <el-form-item label="考勤状态设置：" prop="day">
             <span>根据已设置好的考勤状态执行。</span>
@@ -106,6 +119,10 @@ export default {
       default () {
         return {}
       }
+    },
+    userIds: {
+      type: Number,
+      default: 0
     }
   },
   watch: {
@@ -113,14 +130,13 @@ export default {
       handler (val) {
         console.log('val', val)
         this.group = val
+        this.dayArr = [6]
         if (this.rowData.dayoff) {
           const day = this.rowData.dayoff.split(',')
           for (var i = 0; i < day.length; i++) {
-            this.day.push(day[i] - 0)
+            this.dayArr.push(day[i] - 0)
           }
-          console.log('this.day', this.day)
-        } else {
-          this.day = []
+          // console.log('this.day', this.day)
         }
       },
       deep: true
@@ -130,7 +146,7 @@ export default {
     return {
       timer: null,
       loading: false,
-      day: [],
+      dayArr: [6],
       group: { day: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] },
       rules: {
         // 校验规则
@@ -139,7 +155,8 @@ export default {
           { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
         ]
       },
-      value: new Date()
+      value: new Date(),
+      dayTitle: ''
     }
   },
   methods: {
@@ -151,16 +168,19 @@ export default {
         if (valid) {
           console.log('this.group', this.group)
           this.rowData.dayoff = ''
-          this.rowData.users = {}
-          for (var i = 0; i < this.day.length; i++) {
+          this.rowData.users = []
+          for (var i = 0; i < this.dayArr.length; i++) {
             if (i > 0) {
               this.rowData.dayoff += ','
             }
-            this.rowData.dayoff += this.day[i]
+            this.rowData.dayoff += this.dayArr[i]
           }
-          this.$emit('onModal', this.rowData)
+          if (this.modalTitle === '添加用户') {
+            this.$emit('onModal', false)
+          } else {
+            this.$emit('onModal', true)
+          }
           this.$emit('update:dialogVisible', false)
-          // this.resetForm(formName);
         } else {
           console.log('error submit!!')
           return false
@@ -172,7 +192,6 @@ export default {
      */
     resetForm () {
       this.$refs['rowData'].resetFields()
-      // this.dialogVisible = false;
       this.$emit('update:dialogVisible', false)
     },
     /**
@@ -193,7 +212,7 @@ export default {
             }, 400)
           }, 2000)
         })
-        .catch((_) => {})
+        .catch((_) => { })
     },
     cancelForm () {
       this.loading = false
@@ -203,7 +222,50 @@ export default {
     choseUser () {
       console.log('改变isChoseUser')
       this.$emit('update:isChoseUser', true)
-      // console.log('改变dialogVisible1',dialogVisible1);
+    },
+    /**
+     * @description 休息日判断
+     */
+    dealMyDate (data) {
+      // console.log('day.type', data.type)
+      console.log('this.dayArr', this.dayArr)
+      const weekNum = this.getWeek(data.day)
+      let res = ''
+      if (this.rowData.type === 0 && (weekNum === '周六' || weekNum === '周日') && data.type === 'current-month') {
+        res = 1
+      } else if (this.dayArr === [6] && data.type === 'current-month') {
+        if (weekNum === '周六') {
+          res = 2
+        } else if (weekNum === '周日') {
+          const abc = data.day.split('-').slice(2).join('-')
+          const bcd = abc - 0
+          if (bcd % 2 !== 0) {
+            res = 3
+          }
+        }
+      } else if (this.dayArr === [7] && data.type === 'current-month') {
+        if (weekNum === '周日') {
+          res = 2
+          // break
+        } else if (weekNum === '周六') {
+          const abc = data.day.split('-').slice(2).join('-')
+          const bcd = abc - 0
+          if (bcd % 2 === 0) {
+            res = 3
+          }
+        }
+      }
+      return res
+    },
+    /**
+       * 根据日期字符串获取星期几
+       * @param dateString 日期字符串（如：2020-05-02）
+       * @returns {String}
+       */
+    getWeek (dateString) {
+      var dateArray = dateString.split('-')
+      var date = new Date(dateArray[0], parseInt(dateArray[1] - 1), dateArray[2])
+      return '周' + '日一二三四五六'.charAt(date.getDay())
     }
   }
 }
@@ -240,5 +302,20 @@ export default {
 }
 .demo-drawer__footer {
   margin-left: 620px;
+}
+.is-selected {
+  // color: #1989fa;
+  background-color: #f2f8fe;
+  width: 94px;
+  height: 65px;
+  float: left;
+}
+>>> .el-calendar-table .el-calendar-day {
+  padding: 0px;
+  p {
+    display: inline-block;
+    width: 94px;
+    height: 65px;
+  }
 }
 </style>

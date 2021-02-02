@@ -9,6 +9,7 @@
       @onSearch="onSearch"
       :btn-tools="btnTools"
       @toolsBtn="toolsBtn"
+      @currPage="currPage"
     />
     <!-- 表格+分页 -->
     <attendance-table
@@ -105,7 +106,7 @@ export default {
           message: '添加成功'
         })
         this.getStatusList(1)
-      } else if (res.code === 500) {
+      } else if (res.code === -1) {
         // this.openTip(res.msg, '提示')
         this.$message({
           type: 'info',
@@ -134,7 +135,7 @@ export default {
             type: 'info',
             message: '已取消删除'
           })
-        })    
+        })
     },
     /**
      * @description 选择每页数据条数返回内容

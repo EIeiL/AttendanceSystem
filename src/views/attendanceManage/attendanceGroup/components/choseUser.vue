@@ -14,15 +14,17 @@
             <el-input
               v-model="search"
               placeholder="输入关键字进行搜索"
+              @input="getUserList"
             ></el-input>
           </span>
-          <span class="form-left">
+          <span class="form-left" v-loading="loading">
             <el-checkbox-group
               v-model="checkd"
-              v-for="(item, index) in users"
+              v-for="(item, index) in counts"
               :key="index"
+              @change="changeChecked"
             >
-              <el-checkbox :label="item.username"></el-checkbox>
+              <el-checkbox :label="item.id" >{{item.username}}</el-checkbox>
             </el-checkbox-group>
           </span>
           <div></div>
@@ -32,9 +34,9 @@
               <div>
                 <el-button
                   class="people-button"
-                  v-for="(item, index) in checkd"
+                  v-for="(item, index) in checkUserList"
                   :key="index"
-                  @click="delUser"
+                  @click="delUser(index)"
                 >
                   {{ item.username }} <span class="red-icon">X</span>
                 </el-button>
@@ -72,29 +74,38 @@ export default {
     return {
       count: 0,
       counts: [], // 所有人员名单
-      users: [],
       search: '', // 输入框内容
-      checkd: this.choseUsers, // 选中人员名单
-      chose: {} // 表单绑定 目前无用
+      checkd: [], // 选中人员名单
+      loading: false,
+      chose: {}, // 表单绑定 目前无用
+      checkUserList: []// 选中人员名单
     }
   },
   watch: {
-    search: {
+    'choseUsers': {
       handler (val) {
-        this.users = []
-        for (var i = 0; i < this.counts.length; i++) {
-          if (this.search === this.counts[i].username) {
-            this.users.push(this.counts[i])
-          }
+        this.checkd = []
+        for (var i = 0; i < this.choseUsers.length; i++) {
+          this.checkd.push(this.choseUsers[i].id)
         }
-      }
-      // deep: true
+        // this.checkd = this.choseUsers
+      },
+      deep: true
     }
   },
   created () {
     this.getUserList()
   },
   methods: {
+    /**
+     * @description 复选框选中触发事件
+     */
+    changeChecked (val) {
+      const list = this.counts.filter(item => {
+        return val.includes(item.id)
+      })
+      this.checkUserList = list
+    },
     /**
      * @description 加载姓名列表
      */
@@ -107,18 +118,35 @@ export default {
      * @description 获取用户列表
      */
     async getUserList () {
-      const res = await this.$request.getMyUser({})
+      this.loading = true
+      const res = await this.$request.getMyUser({
+        username: this.search
+      })
       // console.log('res', res)
-      if (res.code === 0 && res.data.length > 0) {
-        this.counts = res.data
-        this.users = this.counts
+      if (res.code === 0) {
+        this.counts = []
+        if (res.data.length > 0) {
+          // for (var i = 0; i < res.data.length; i++) {
+          //   this.counts.push(res.data[i].username)
+          // }
+          this.counts = res.data
+        }
       }
+      this.loading = false
     },
     /**
      * @description 添加按钮触发事件
      */
     submitForm () {
-      this.$emit('onModal1', this.checkd)
+      // let ids = []
+      // this.checkUserList.forEach(item => {
+      //   ids.push(item.id)
+      // })
+      const checkUserList = JSON.parse(JSON.stringify(this.checkUserList))
+      this.$emit('update:choseUsers', checkUserList)
+      this.$emit('update:userIds', this.checkd)
+      this.$emit('onModal1')
+      this.search = ''
       this.resetForm()
     },
     /**
@@ -133,9 +161,14 @@ export default {
     /**
      * @description 删除选中人员
      */
-    delUser (val) {
+    delUser (index) {
       // console.log("删除人员：", val);
-      this.checkd.splice(val, 1)
+      this.checkUserList.splice(index, 1)
+      let ids = []
+      this.checkUserList.forEach(item => {
+        ids.push(item.id)
+      })
+      this.checkd = ids
     }
   }
 }
@@ -163,7 +196,7 @@ export default {
     width: 320px;
     height: 260px;
     overflow: auto;
-    .el-checkbox{
+    .el-checkbox {
       font-size: 18px;
     }
   }
