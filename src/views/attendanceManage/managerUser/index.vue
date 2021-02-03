@@ -244,8 +244,8 @@ export default {
      */
     pageSize (val) {
       this.searchParam.pageSize = val
-      // const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
-      this.getUserList(1)
+      const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
+      this.getUserList(currPage)
     },
     /**
      * @description 跳转至某一页选择内容
