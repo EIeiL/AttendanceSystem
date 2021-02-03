@@ -232,12 +232,25 @@ export default {
     onModal1 (val) {
       // console.log('导入用户', val)
       // setTimeout(this.getUserList(1), 500)
-      this.$message({
-        type: 'info',
-        message: '导入成功' + val.data.successCount + '条，导入失败' + val.data.errorCount + '条'
-      })
-      this.dialogVisible1 = false
-      this.getUserList(1)
+      if (val.code === 0) {
+        var successCount = 0
+        var errorCount = 0
+        if (val.data) {
+          successCount = val.data.successCount
+          errorCount = val.data.errorCount
+        }
+        this.$message({
+          type: 'info',
+          message: '导入成功' + successCount + '条，导入失败' + errorCount + '条'
+        })
+        this.dialogVisible1 = false
+        this.getUserList(1)
+      } else if (val.code === -1) {
+        this.$message({
+          type: 'info',
+          message: val.msg
+        })
+      }
     },
     /**
      * @description 选择每页数据条数返回内容

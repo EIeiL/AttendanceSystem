@@ -105,6 +105,7 @@ export default {
           type: 'success',
           message: '添加成功'
         })
+        this.dialogVisible = false
         this.getStatusList(1)
       } else if (res.code === -1) {
         // this.openTip(res.msg, '提示')

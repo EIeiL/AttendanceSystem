@@ -118,6 +118,11 @@ export default {
         })
         this.dialogVisible = false
         this.getAttendanceList(1)
+      } else if (res.code === -1) {
+        this.$message({
+          type: 'sucess',
+          message: res.msg
+        })
       }
     },
     /**

@@ -140,7 +140,7 @@ export default {
         value: [
           { required: true, message: '请选择', trigger: 'blur' }
         ],
-        time: []
+        time: [{ required: true, message: '请选择', trigger: 'blur' }]
       }
     }
   },
@@ -149,18 +149,22 @@ export default {
      * @description 添加按钮触发事件
      */
     submitForm () {
-      if (this.formItem.time === '' && this.num !== '缺卡') {
-        this.formItem.time = this.startTime + '-' + this.endTime
-      }
       this.$refs['formItem'].validate((valid) => {
         if (valid) {
+          if (this.formItem.time === '' && this.num !== '缺卡') {
+            this.formItem.time = this.startTime + '-' + this.endTime
+          }
           // console.log('this.formItem', this.formItem)
           const form = JSON.parse(JSON.stringify(this.formItem))
           console.log('form', form)
           this.$emit('onModal', form)
-          this.resetForm()
+          // this.resetForm()
+          // this.formItem = { value: '', time: '' }
         } else {
-          console.log('error submit!!')
+          this.$message({
+            type: 'info',
+            message: '校验失败'
+          })
           return false
         }
       })

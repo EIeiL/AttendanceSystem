@@ -134,6 +134,11 @@ export default {
         this.rowData = {}
         this.userIds = []
         this.getGroupList(1)
+      } else if (res.code === -1) {
+        this.$message({
+          type: 'info',
+          message: res.msg
+        })
       }
     },
     /**

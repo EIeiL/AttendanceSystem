@@ -50,16 +50,23 @@
           >
             <el-checkbox-group
               v-model="dayArr"
-              :min="1"
-              @change="rowData.type = JSON.stringify(dayArr) === JSON.stringify([ 6,7 ]) ? 0 : 1"
+              :max="rowData.type === 0 ? 2 : 1"
             >
               <el-checkbox :label="1" disabled>周一</el-checkbox>
               <el-checkbox :label="2" disabled>周二</el-checkbox>
               <el-checkbox :label="3" disabled>周三</el-checkbox>
               <el-checkbox :label="4" disabled>周四</el-checkbox>
               <el-checkbox :label="5" disabled>周五</el-checkbox>
-              <el-checkbox :label="6">周六</el-checkbox>
-              <el-checkbox :label="7">周日</el-checkbox>
+              <el-checkbox
+                :label="6"
+                :disabled="rowData.type === 0 ? true : false"
+                >周六</el-checkbox
+              >
+              <el-checkbox
+                :label="7"
+                :disabled="rowData.type === 0 ? true : false"
+                >周日</el-checkbox
+              >
             </el-checkbox-group>
           </el-form-item>
           <el-calendar v-model="value" class="attendance-calendar">
@@ -76,12 +83,9 @@
           </el-form-item>
         </el-form>
         <div class="demo-drawer__footer">
-          <el-button
-            type="primary"
-            @click="submitForm"
-            :loading="loading"
-            >{{ loading ? "提交中 ..." : "添 加" }}</el-button
-          >
+          <el-button type="primary" @click="submitForm" :loading="loading">{{
+            loading ? "提交中 ..." : "添 加"
+          }}</el-button>
           <!-- <el-button type="primary" @click="submitForm">添 加</el-button> -->
           <el-button @click="resetForm">取 消</el-button>
         </div>
@@ -125,6 +129,7 @@ export default {
       handler (val) {
         // this.group = val
         console.log(val)
+        this.dayArr = []
         if (this.rowData.dayoff) {
           const day = this.rowData.dayoff.split(',')
           for (var i = 0; i < day.length; i++) {
@@ -158,7 +163,8 @@ export default {
         setting: [{ required: false, trigger: 'blur' }]
       },
       value: new Date(), // 日历相关
-      dayTitle: '' // 上班or放假
+      dayTitle: '', // 上班or放假
+      isSunday: false
     }
   },
   methods: {
@@ -167,7 +173,7 @@ export default {
      */
     submitForm () {
       this.$refs['rowData'].validate((valid) => {
-        if (valid) {
+        if (valid && this.dayArr.length > 0) {
           this.loading = true
           // console.log('this.group', this.group)
           this.rowData.dayoff = '' // 拼接休息日数组
@@ -186,7 +192,10 @@ export default {
           // this.$emit('update:dialogVisible', false)
           setTimeout(this.loading = false, 5000)
         } else {
-          console.log('error submit!!')
+          this.$message({
+            type: 'info',
+            message: '校验失败'
+          })
           return false
         }
       })
@@ -207,7 +216,7 @@ export default {
       let res = ''
       if (this.rowData.type === 0 && (weekNum === '周六' || weekNum === '周日') && data.type === 'current-month') {
         res = 1
-      } else if (JSON.stringify(this.dayArr) === JSON.stringify([ 6 ]) && data.type === 'current-month') {
+      } else if (JSON.stringify(this.dayArr) === JSON.stringify([6]) && data.type === 'current-month') {
         if (weekNum === '周六') {
           res = 2
         } else if (weekNum === '周日') {
@@ -217,7 +226,7 @@ export default {
             res = 3
           }
         }
-      } else if (JSON.stringify(this.dayArr) === JSON.stringify([ 7 ]) && data.type === 'current-month') {
+      } else if (JSON.stringify(this.dayArr) === JSON.stringify([7]) && data.type === 'current-month') {
         if (weekNum === '周日') {
           res = 2
         } else if (weekNum === '周六') {

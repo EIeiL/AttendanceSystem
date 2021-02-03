@@ -18,7 +18,7 @@
             <el-upload
               class="upload-demo"
               ref="upload"
-              :limit="1"
+              :limit="999"
               :action="doUpload"
               :on-remove="handleRemove"
               :on-success="getRes"
@@ -80,13 +80,16 @@ export default {
      * @description 是否在选取文件后立即进行上传
      */
     submitUpload () {
+      // console.log(this.$refs.upload.uploadFiles, 'this.$refs.upload')
+      const uploadFiles = this.$refs.upload.uploadFiles
+      this.$refs.upload.uploadFiles = [uploadFiles[uploadFiles.length - 1]]
       this.$refs.upload.submit()
     },
     /**
      * @description 文件列表移除文件时的钩子
      */
     handleRemove (file, fileList) {
-      console.log(file, fileList)
+      // console.log(file, fileList)
       this.fileList = []
       this.btnName = '选择文件'
     },
@@ -100,7 +103,9 @@ export default {
      * @description 文件上传成功时的钩子
      */
     getRes (response, file, fileList) {
-      console.log('response', response)
+      // console.log('file', file)
+      // console.log('fileList', fileList)
+      // console.log('response', response)
       this.$emit('onModal1', response)
       this.btnName = '选择文件'
     }
