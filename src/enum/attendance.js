@@ -149,7 +149,7 @@ export const managerUser = {
       element: 'el-input',
       placeholder: '请输入用户姓名',
       rules: [
-        { required: true, message: '请输入用户姓名', trigger: 'blur' },
+        { required: true, message: '用户姓名不能为空', trigger: 'blur' },
         { min: 2, max: 5, message: '长度在 2 到 5 个字符' },
         { pattern: /^[\u4E00-\u9FA5]+$/, message: '用户名只能为中文' }
       ]
@@ -159,11 +159,11 @@ export const managerUser = {
       element: 'el-input',
       placeholder: '请输入联系电话',
       rules: [
-        { required: true, message: '请输入电话号码', trigger: 'blur' },
+        { required: true, message: '联系号码不能为空', trigger: 'blur' },
         {
           validator: function (rule, value, callback) {
             if (/^1[34578]\d{9}$/.test(value) === false) {
-              callback(new Error('请输入有效的电话号码'))
+              callback(new Error('联系电话只支持数字格式，请修改'))
             } else {
               callback()
             }

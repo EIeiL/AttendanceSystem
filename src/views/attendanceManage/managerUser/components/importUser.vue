@@ -26,8 +26,11 @@
               :file-list="fileList"
               :auto-upload="false"
             >
-              <el-button slot="trigger" size="small" type="primary"
+              <el-button slot="trigger" size="small" type="primary" v-if="JSON.stringify(fileList) === JSON.stringify([])"
                 >选取文件</el-button
+              >
+              <el-button slot="trigger" size="small" type="primary" v-else
+                >{{ fileList[0] }}</el-button
               >
               <div slot="tip" class="el-upload__tip">
                 只能上传xls文件

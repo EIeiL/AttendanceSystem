@@ -122,6 +122,7 @@ export default {
     onReset () {
       this.$refs.formRef.resetFields()
       this.$emit('currPage', 1)
+      this.onSearch()
     },
     /**
      * @description 添加初始值

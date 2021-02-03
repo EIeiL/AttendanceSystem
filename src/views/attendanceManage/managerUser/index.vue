@@ -106,10 +106,14 @@ export default {
           ...this.searchParam,
           telephone: val.content
         })
-      } else {
+      } else if (val.content) {
         this.$message({
-          type: 'success',
+          type: 'info',
           message: '请选择匹配字段'
+        })
+      } else {
+        res = await this.$request.getUser({
+          ...this.searchParam
         })
       }
       // console.log('搜索res', res)
@@ -216,7 +220,7 @@ export default {
         } else {
           this.$message({
             type: 'info',
-            message: res.msg
+            message: '该姓名已存在，请修改'
           })
         }
       }
