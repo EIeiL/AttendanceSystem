@@ -8,7 +8,6 @@
       :before-close="resetForm"
     >
       <span>
-        <!-- 这是一段信息 -->
         <el-form :model="chose" ref="chose" class="demo-chose">
           <span class="people-search">
             <el-input
@@ -57,38 +56,45 @@
 <script>
 export default {
   props: {
-    isChoseUser: {
-      // 控制模态框是否显示
+    isChoseUser: {// 控制模态框是否显示
       type: Boolean,
       default: false
     },
-    choseUsers: {
-      // 控制模态框是否显示
+    choseUsers: {// 控制模态框是否显示
       type: Array,
       default () {
         return []
       }
+    },
+    modalTitle: {// 控制模态框是否显示
+      type: String,
+      default: '添加考勤组'
     }
   },
   data () {
     return {
-      count: 0,
+      count: 0, // 加载相关
       counts: [], // 所有人员名单
       search: '', // 输入框内容
       checkd: [], // 选中人员名单
       loading: false,
       chose: {}, // 表单绑定 目前无用
-      checkUserList: []// 选中人员名单
+      checkUserList: [], // 选中人员名单
+      checkdInit: []
     }
   },
   watch: {
     'choseUsers': {
       handler (val) {
         this.checkd = []
+        this.checkdInit = []
+        this.checkUserList = []
         for (var i = 0; i < this.choseUsers.length; i++) {
           this.checkd.push(this.choseUsers[i].id)
+          this.checkUserList.push(this.choseUsers[i])
         }
         // this.checkd = this.choseUsers
+        this.checkdInit = this.checkd
       },
       deep: true
     }
@@ -155,7 +161,8 @@ export default {
     resetForm () {
       // this.$refs["chose"].resetFields();
       this.search = ''
-      // this.checkd = []
+      this.checkd = this.checkdInit
+      this.checkUserList = this.choseUsers
       this.$emit('update:isChoseUser', false)
     },
     /**

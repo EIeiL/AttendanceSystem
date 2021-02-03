@@ -7,6 +7,7 @@
       style="width: 90%"
       :default-sort="{ prop: 'date', order: 'descending' }"
       :header-cell-style="tableHeaderColor"
+      max-height="700"
       border
     >
       <el-table-column

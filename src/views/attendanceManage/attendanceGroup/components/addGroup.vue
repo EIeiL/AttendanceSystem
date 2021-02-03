@@ -63,7 +63,7 @@
             </el-checkbox-group>
           </el-form-item>
           <el-calendar v-model="value" class="attendance-calendar">
-            <template slot="dateCell" slot-scope="{ date, data }">
+            <template slot="dateCell" slot-scope="{ data }">
               <p :class="dealMyDate(data) ? 'is-selected' : ''">
                 {{ data.day.split("-").slice(2).join("-") }}
                 <br />
@@ -123,15 +123,13 @@ export default {
   watch: {
     rowData: {
       handler (val) {
-        console.log('val', val)
-        this.group = val
-        // this.dayArr = [6]
+        // this.group = val
+        console.log(val)
         if (this.rowData.dayoff) {
           const day = this.rowData.dayoff.split(',')
           for (var i = 0; i < day.length; i++) {
             this.dayArr.push(day[i] - 0)
           }
-          // console.log('this.day', this.day)
         }
       },
       deep: true
@@ -141,10 +139,9 @@ export default {
     return {
       timer: null,
       loading: false,
-      dayArr: [7],
-      group: { day: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] },
-      rules: {
-        // 校验规则
+      dayArr: [7], // 休息日
+      // group: { day: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] },
+      rules: {// 校验规则
         name: [
           { required: true, message: '请输入考勤组名称', trigger: 'blur' },
           { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' },
@@ -160,8 +157,8 @@ export default {
         people: [{ required: false, trigger: 'blur' }],
         setting: [{ required: false, trigger: 'blur' }]
       },
-      value: new Date(),
-      dayTitle: ''
+      value: new Date(), // 日历相关
+      dayTitle: '' // 上班or放假
     }
   },
   methods: {
@@ -172,8 +169,8 @@ export default {
       this.$refs['rowData'].validate((valid) => {
         if (valid) {
           this.loading = true
-          console.log('this.group', this.group)
-          this.rowData.dayoff = ''
+          // console.log('this.group', this.group)
+          this.rowData.dayoff = '' // 拼接休息日数组
           this.rowData.users = []
           for (var i = 0; i < this.dayArr.length; i++) {
             if (i > 0) {
@@ -181,7 +178,7 @@ export default {
             }
             this.rowData.dayoff += this.dayArr[i]
           }
-          if (this.modalTitle === '添加用户') {
+          if (this.modalTitle === '添加用户') { // 判断添加or编辑
             this.$emit('onModal', false)
           } else {
             this.$emit('onModal', true)
@@ -200,6 +197,48 @@ export default {
     resetForm () {
       this.$refs['rowData'].resetFields()
       this.$emit('update:dialogVisible', false)
+      this.$emit('update:userIds', [])
+    },
+    /**
+     * @description 休息日判断--日历选中
+     */
+    dealMyDate (data) {
+      const weekNum = this.getWeek(data.day)
+      let res = ''
+      if (this.rowData.type === 0 && (weekNum === '周六' || weekNum === '周日') && data.type === 'current-month') {
+        res = 1
+      } else if (JSON.stringify(this.dayArr) === JSON.stringify([ 6 ]) && data.type === 'current-month') {
+        if (weekNum === '周六') {
+          res = 2
+        } else if (weekNum === '周日') {
+          const abc = data.day.split('-').slice(2).join('-')
+          const bcd = abc - 0
+          if (bcd % 2 !== 0) {
+            res = 3
+          }
+        }
+      } else if (JSON.stringify(this.dayArr) === JSON.stringify([ 7 ]) && data.type === 'current-month') {
+        if (weekNum === '周日') {
+          res = 2
+        } else if (weekNum === '周六') {
+          const abc = data.day.split('-').slice(2).join('-')
+          const bcd = abc - 0
+          if (bcd % 2 === 0) {
+            res = 3
+          }
+        }
+      }
+      return res
+    },
+    /**
+       * 根据日期字符串获取星期几
+       * @param dateString 日期字符串（如：2020-05-02）
+       * @returns {String}
+       */
+    getWeek (dateString) {
+      var dateArray = dateString.split('-')
+      var date = new Date(dateArray[0], parseInt(dateArray[1] - 1), dateArray[2])
+      return '周' + '日一二三四五六'.charAt(date.getDay())
     },
     /**
      * 抽屉加入
@@ -229,50 +268,6 @@ export default {
     choseUser () {
       console.log('改变isChoseUser')
       this.$emit('update:isChoseUser', true)
-    },
-    /**
-     * @description 休息日判断
-     */
-    dealMyDate (data) {
-      // console.log('day.type', data.type)
-      // console.log('this.dayArr', JSON.stringify(this.dayArr) === JSON.stringify([ 6, 7 ]))
-      const weekNum = this.getWeek(data.day)
-      let res = ''
-      if (this.rowData.type === 0 && (weekNum === '周六' || weekNum === '周日') && data.type === 'current-month') {
-        res = 1
-      } else if (JSON.stringify(this.dayArr) === JSON.stringify([ 6 ]) && data.type === 'current-month') {
-        if (weekNum === '周六') {
-          res = 2
-        } else if (weekNum === '周日') {
-          const abc = data.day.split('-').slice(2).join('-')
-          const bcd = abc - 0
-          if (bcd % 2 !== 0) {
-            res = 3
-          }
-        }
-      } else if (JSON.stringify(this.dayArr) === JSON.stringify([ 7 ]) && data.type === 'current-month') {
-        if (weekNum === '周日') {
-          res = 2
-          // break
-        } else if (weekNum === '周六') {
-          const abc = data.day.split('-').slice(2).join('-')
-          const bcd = abc - 0
-          if (bcd % 2 === 0) {
-            res = 3
-          }
-        }
-      }
-      return res
-    },
-    /**
-       * 根据日期字符串获取星期几
-       * @param dateString 日期字符串（如：2020-05-02）
-       * @returns {String}
-       */
-    getWeek (dateString) {
-      var dateArray = dateString.split('-')
-      var date = new Date(dateArray[0], parseInt(dateArray[1] - 1), dateArray[2])
-      return '周' + '日一二三四五六'.charAt(date.getDay())
     }
   }
 }

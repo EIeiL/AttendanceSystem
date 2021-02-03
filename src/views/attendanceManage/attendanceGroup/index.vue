@@ -25,7 +25,7 @@
     <addGroup-modal
       :dialogVisible.sync="dialogVisible"
       :modalTitle="modalTitle"
-      :userIds="userIds.length"
+      :userIds.sync="userIds.length"
       :rowData="rowData"
       :isChoseUser.sync="isChoseUser"
       @onModal="onModal"
@@ -33,6 +33,7 @@
     <choseUser-modal
       :isChoseUser.sync="isChoseUser"
       :choseUsers.sync="rowData.users"
+      :modalTitle="modalTitle"
       :userIds.sync="userIds"
       @onModal1="onModal1"
     />
@@ -64,7 +65,7 @@ export default {
   data () {
     return {
       rowData: {}, // 某行数据
-      userIds: [],
+      userIds: [], // 提交数据，用户id列表
       dialogVisible: false, // 控制新增+编辑模态框是否显示
       isChoseUser: false, // 控制选择人员模态框是否显示
       modalTitle: '', // 模态框标题
@@ -92,9 +93,7 @@ export default {
     toolsBtn (val) {
       // console.log('点击添加考勤组按钮', val)
       this.modalTitle = '添加考勤组'
-      this.rowData = {users: []}
-      console.log('this.rowData', this.rowData)
-      // this.rowUser = []
+      this.rowData = {users: [], type: 1}
       this.dialogVisible = true
     },
     /**
@@ -108,22 +107,32 @@ export default {
         name: this.rowData.name,
         userIds: this.userIds,
         type: this.rowData.type,
-        dayoff: this.rowData.dayoff
+        dayoff: this.rowData.dayoff,
+        ifDel: this.rowData.ifDel ? this.rowData.ifDel : 0
       }
       if (val === true) {
         obj.id = this.rowData.id
       }
+      console.log('obj', obj)
       const res = await this.$request.addGroup({
         // ...this.rowData
         ...obj
       })
       // console.log('res', res)
       if (res.code === 0) {
+        this.dialogVisible = false
+        var successTip
+        if (this.modalTitle === '添加考勤组') {
+          successTip = '添加成功'
+        } else {
+          successTip = '编辑成功'
+        }
         this.$message({
           type: 'success',
-          message: '添加成功'
+          message: successTip
         })
         this.rowData = {}
+        this.userIds = []
         this.getGroupList(1)
       }
     },
@@ -133,7 +142,6 @@ export default {
     async onModal1 (val) {
       // console.log('选择人员模态框', val)
       // this.rowData.users = val
-      console.log('aaaarowData', this.rowData)
       const id = this.rowData.id
       const res = await this.$request.isOtherGroup({
         id: id,
@@ -141,14 +149,16 @@ export default {
       })
       // console.log('获取考勤状态数据', res)
       var tip = '用户'
+      // var tipGroup = ''
       for (var i = 0; i < res.data.userList.length; i++) {
         if (i > 0) {
           tip += '、'
+          // tipGroup += '、'
         }
         tip += res.data.userList[i]
-        console.log(res.data.userList[i])
+        // tipGroup += res.data.groupList[i]
       }
-      tip += '已存在其他考勤组，是否将用户加入本考勤组'
+      tip += '已存在其他考勤组，是否将用户加入本考勤组？'
       if (res.code === 0 && res.data.userList.length > 0) {
         this.openTip(tip, '提示')
       }
@@ -164,7 +174,7 @@ export default {
           })
           if (res.code === 0) {
             this.$message({
-              type: 'success',
+              type: 'warning',
               message: '删除成功!'
             })
             this.getGroupList(1)
@@ -181,23 +191,14 @@ export default {
      */
     onTableEdit (val) {
       // console.log('点击编辑', val)
-      console.log('拷贝val', val)
       this.rowData.users = []
-      // var o
-      // if (typeof val === 'object') {
-      //   o = deepCopy.objDeepCopy(val)
-      // } else {
-      //   o = val
-      // }
       const obj = JSON.parse(JSON.stringify(val))
       obj.users = obj.users ? obj.users : []
       this.rowData = obj
-      console.log('rowdata', this.rowData)
       this.userIds = []
       for (var i = 0; i < this.rowData.peopleSize; i++) {
         this.userIds.push(this.rowData.users[i].id)
       }
-      console.log('this.userids', this.userIds)
       this.modalTitle = '编辑考勤组'
       this.dialogVisible = true
     },
@@ -206,8 +207,8 @@ export default {
      */
     pageSize (val) {
       this.searchParam.pageSize = val
-      const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
-      this.getGroupList(currPage)
+      // const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
+      this.getGroupList(1)
     },
     /**
      * @description 跳转至某一页选择内容
@@ -235,7 +236,6 @@ export default {
           }
           this.$set(tableDataTemp, i, obj)
         }
-        
         if (res.data.total > 0) {
           this.count = res.data.total
           this.tableData = tableDataTemp

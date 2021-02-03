@@ -102,7 +102,7 @@ export default {
       // console.log('res', res)
       if (res.code === 0) {
         this.$message({
-          type: 'info',
+          type: 'success',
           message: '添加成功'
         })
         this.getStatusList(1)
@@ -125,7 +125,7 @@ export default {
           })
           if (res.code === 0) {
             this.$message({
-              type: 'success',
+              type: 'warning',
               message: '删除成功!'
             })
             this.getStatusList(1)
@@ -142,8 +142,8 @@ export default {
      */
     pageSize (val) {
       this.searchParam.pageSize = val
-      const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
-      this.getStatusList(currPage)
+      // const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
+      this.getStatusList(1)
     },
     /**
      * @description 跳转至某一页选择内容

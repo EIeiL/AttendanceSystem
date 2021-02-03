@@ -152,7 +152,7 @@ export default {
           })
           if (res.code === 0) {
             this.$message({
-              type: 'success',
+              type: 'warning',
               message: '删除成功!'
             })
             this.getUserList(1)
@@ -197,6 +197,7 @@ export default {
             type: 'info',
             message: '编辑成功'
           })
+          this.dialogVisible = false
           this.getUserList(1)
         } else {
           this.$message({
@@ -212,7 +213,7 @@ export default {
         if (res.code === 0) {
           // console.log('添加success')
           this.$message({
-            type: 'info',
+            type: 'success',
             message: '添加成功'
           })
           this.dialogVisible = false
@@ -243,8 +244,8 @@ export default {
      */
     pageSize (val) {
       this.searchParam.pageSize = val
-      const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
-      this.getUserList(currPage)
+      // const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
+      this.getUserList(1)
     },
     /**
      * @description 跳转至某一页选择内容

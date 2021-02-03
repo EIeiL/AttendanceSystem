@@ -14,23 +14,21 @@
           class="demo-fileList"
           :rules="rules"
         >
-          <el-form-item label="选择文件" prop="file">
+          <el-form-item label="选择文件:" prop="file">
             <el-upload
               class="upload-demo"
               ref="upload"
               :limit="1"
               :action="doUpload"
-              :on-preview="handlePreview"
               :on-remove="handleRemove"
               :on-success="getRes"
               :file-list="fileList"
               :auto-upload="false"
+              :on-change="changeBtn"
+              :show-file-list='false'
             >
-              <el-button slot="trigger" size="small" type="primary" v-if="JSON.stringify(fileList) === JSON.stringify([])"
-                >选取文件</el-button
-              >
-              <el-button slot="trigger" size="small" type="primary" v-else
-                >{{ fileList[0] }}</el-button
+              <el-button slot="trigger" size="small"
+                >{{btnName}}</el-button
               >
               <div slot="tip" class="el-upload__tip">
                 只能上传xls文件
@@ -65,56 +63,46 @@ export default {
           { required: true, message: '请选择文件', trigger: 'blur' }
         ]
       },
-      fileList: [] // 上传文件列表
+      fileList: [], // 上传文件列表
+      btnName: '选择文件'
     }
   },
   methods: {
-    /**
-     * @description 添加按钮触发事件
-     */
-    submitForm () {
-      this.$refs['fileList'].validate((valid) => {
-        if (valid) {
-          this.$emit('onModal1', this.fileList)
-          this.$emit('update:dialogVisible1', false)
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
-    },
     /**
      * @description 取消/关闭按钮触发事件
      */
     resetForm () {
       this.fileList = []
       this.$emit('update:dialogVisible1', false)
+      this.btnName = '选择文件'
     },
     /**
      * @description 是否在选取文件后立即进行上传
      */
-    async submitUpload () {
-      await this.$refs.upload.submit()
-      // var res = this.$refs.upload.submit()
-      // console.log(res, 'res')
-      // this.fileList = []
-      // this.$emit('update:dialogVisible1', false)
+    submitUpload () {
+      this.$refs.upload.submit()
     },
     /**
      * @description 文件列表移除文件时的钩子
      */
     handleRemove (file, fileList) {
       console.log(file, fileList)
+      this.fileList = []
+      this.btnName = '选择文件'
     },
     /**
-     * @description 点击文件列表中已上传的文件时的钩子
+     * @description
      */
-    handlePreview (file) {
-      console.log(file)
+    changeBtn (file) {
+      this.btnName = file.name
     },
+    /**
+     * @description 文件上传成功时的钩子
+     */
     getRes (response, file, fileList) {
       console.log('response', response)
       this.$emit('onModal1', response)
+      this.btnName = '选择文件'
     }
   }
 }

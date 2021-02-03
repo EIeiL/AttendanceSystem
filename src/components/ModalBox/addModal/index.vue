@@ -70,7 +70,6 @@ export default {
   watch: {
     'rowData': {
       handler (val) {
-        console.log('val', val)
         this.formInline = val
       },
       deep: true
