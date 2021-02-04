@@ -28,6 +28,7 @@
       :dialogVisible.sync="dialogVisible"
       :modalTitle="modalTitle"
       @onModal="onModal"
+      ref="addStatus"
     />
   </div>
 </template>
@@ -99,16 +100,14 @@ export default {
         name: val.value,
         rule: val.time
       })
-      // console.log('res', res)
       if (res.code === 0) {
         this.$message({
           type: 'success',
           message: '添加成功'
         })
-        this.dialogVisible = false
+        this.$refs.addStatus.resetForm()
         this.getStatusList(1)
       } else if (res.code === -1) {
-        // this.openTip(res.msg, '提示')
         this.$message({
           type: 'info',
           message: res.msg

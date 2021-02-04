@@ -127,8 +127,6 @@ export default {
   watch: {
     rowData: {
       handler (val) {
-        // this.group = val
-        console.log(val)
         this.dayArr = []
         if (this.rowData.dayoff) {
           const day = this.rowData.dayoff.split(',')
@@ -142,10 +140,9 @@ export default {
   },
   data () {
     return {
-      timer: null,
+      // timer: null,
       loading: false,
       dayArr: [7], // 休息日
-      // group: { day: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] },
       rules: {// 校验规则
         name: [
           { required: true, message: '请输入考勤组名称', trigger: 'blur' },
@@ -163,8 +160,7 @@ export default {
         setting: [{ required: false, trigger: 'blur' }]
       },
       value: new Date(), // 日历相关
-      dayTitle: '', // 上班or放假
-      isSunday: false
+      dayTitle: '' // 上班or放假
     }
   },
   methods: {
@@ -175,7 +171,6 @@ export default {
       this.$refs['rowData'].validate((valid) => {
         if (valid && this.dayArr.length > 0) {
           this.loading = true
-          // console.log('this.group', this.group)
           this.rowData.dayoff = '' // 拼接休息日数组
           this.rowData.users = []
           for (var i = 0; i < this.dayArr.length; i++) {
@@ -192,11 +187,11 @@ export default {
           // this.$emit('update:dialogVisible', false)
           setTimeout(this.loading = false, 5000)
         } else {
-          this.$message({
-            type: 'info',
-            message: '校验失败'
-          })
-          return false
+          // this.$message({
+          //   type: 'info',
+          //   message: '校验失败'
+          // })
+          // return false
         }
       })
     },
@@ -250,6 +245,12 @@ export default {
       return '周' + '日一二三四五六'.charAt(date.getDay())
     },
     /**
+     * @description 打开选择人员模态框
+     */
+    choseUser () {
+      this.$emit('update:isChoseUser', true)
+    },
+    /**
      * 抽屉加入
      */
     handleClose (done) {
@@ -273,10 +274,6 @@ export default {
       this.loading = false
       this.dialog = false
       clearTimeout(this.timer)
-    },
-    choseUser () {
-      console.log('改变isChoseUser')
-      this.$emit('update:isChoseUser', true)
     }
   }
 }

@@ -30,8 +30,12 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="规则设置:" prop="time" ref="timeItem">
-            <span v-if="num === '签到正常' || num === '早退'"
+          <el-form-item
+            label="规则设置:"
+            :prop="num === '迟到'?'timeLate':'time'"
+            ref="timeItem"
+          >
+            <span v-show="num === '签到正常' || num === '早退'"
               >在<el-time-picker
                 v-model="formItem.time"
                 :picker-options="{
@@ -44,7 +48,7 @@
               </el-time-picker
               >之前打卡</span
             >
-            <span v-if="num === '迟到转事假' || num === '签退正常'"
+            <span v-show="num === '迟到转事假' || num === '签退正常'"
               >在<el-time-picker
                 v-model="formItem.time"
                 :picker-options="{
@@ -57,31 +61,20 @@
               </el-time-picker
               >以后打卡</span
             >
-            <span v-if="num === '迟到'"
+            <span v-show="num === '迟到'"
               >在<el-time-picker
-                placeholder="开始时间段"
-                v-model="startTime"
+                is-range
+                v-model="formItem.timeLate"
+                range-separator="至"
+                start-placeholder="开始时间"
+                end-placeholder="结束时间"
+                placeholder="选择时间范围"
                 format="HH:mm:ss"
                 valueFormat="HH:mm:ss"
-                :picker-options="{
-                  selectableRange: '08:30:00 - 20:30:00',
-                }"
-              >
-              </el-time-picker
-              >至
-              <el-time-picker
-                placeholder="结束时间段"
-                v-model="endTime"
-                format="HH:mm:ss"
-                valueFormat="HH:mm:ss"
-                :picker-options="{
-                  selectableRange: '08:30:00 - 20:30:00',
-                }"
-              >
-              </el-time-picker
+              ></el-time-picker
               >之间打卡</span
             >
-            <span v-if="num === '缺卡'">无打卡记录</span>
+            <span v-show="num === '缺卡'">无打卡记录</span>
             <span else></span>
           </el-form-item>
         </el-form>
@@ -132,9 +125,10 @@ export default {
         label: '缺卡'
       }],
       num: '',
-      startTime: '',
-      endTime: '',
-      formItem: { value: '', time: '' },
+      formItem: {
+        value: '',
+        time: ''
+      },
       rules: {
         // 校验规则
         value: [
@@ -151,21 +145,15 @@ export default {
     submitForm () {
       this.$refs['formItem'].validate((valid) => {
         if (valid) {
-          if (this.formItem.time === '' && this.num !== '缺卡') {
-            this.formItem.time = this.startTime + '-' + this.endTime
+          if (this.num === '迟到') {
+            this.formItem.time = this.formItem.timeLate[0] + '-' + this.formItem.timeLate[1]
           }
-          // console.log('this.formItem', this.formItem)
+          delete this.formItem.timeLate
           const form = JSON.parse(JSON.stringify(this.formItem))
           console.log('form', form)
           this.$emit('onModal', form)
           // this.resetForm()
           // this.formItem = { value: '', time: '' }
-        } else {
-          this.$message({
-            type: 'info',
-            message: '校验失败'
-          })
-          return false
         }
       })
     },
@@ -173,6 +161,7 @@ export default {
      * @description 取消/关闭按钮触发事件
      */
     async resetForm () {
+      this.num = ''
       await this.$refs['formItem'].resetFields()
       this.$emit('update:dialogVisible', false)
     },
@@ -180,10 +169,17 @@ export default {
      * @description 下拉框value值改变触发事件
      */
     changeNum (val) {
+      this.formItem.time = ''
       this.num = val
       if (this.num === '缺卡') {
         this.rules.time = []
+      } else if (this.num === '迟到') {
+        delete this.rules.time
+        delete this.formItem.time
+        this.rules.timeLate = [{ required: true, message: '请选择11111', trigger: 'blur' }]
+        this.rules.time = null
       } else {
+        this.rules.timeLate = null
         this.rules.time = [{ required: true, message: '请输入时间', trigger: 'blur' }]
       }
     }
@@ -205,5 +201,8 @@ export default {
 }
 >>> .el-input--suffix .el-input__inner {
   padding-right: 10px;
+}
+>>> .el-range-editor.el-input__inner {
+  width: 200px;
 }
 </style>

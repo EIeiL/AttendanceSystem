@@ -23,7 +23,7 @@
               :key="index"
               @change="changeChecked"
             >
-              <el-checkbox :label="item.id" >{{item.username}}</el-checkbox>
+              <el-checkbox :label="item.id">{{ item.username }}</el-checkbox>
             </el-checkbox-group>
           </span>
           <div></div>
@@ -80,7 +80,8 @@ export default {
       loading: false,
       chose: {}, // 表单绑定 目前无用
       checkUserList: [], // 选中人员名单
-      checkdInit: []
+      checkdInit: [], // 初始选中
+      users: []
     }
   },
   watch: {
@@ -93,7 +94,6 @@ export default {
           this.checkd.push(this.choseUsers[i].id)
           this.checkUserList.push(this.choseUsers[i])
         }
-        // this.checkd = this.choseUsers
         this.checkdInit = this.checkd
       },
       deep: true
@@ -107,10 +107,34 @@ export default {
      * @description 复选框选中触发事件
      */
     changeChecked (val) {
-      const list = this.counts.filter(item => {
+      const list = this.users.filter(item => {
         return val.includes(item.id)
       })
-      this.checkUserList = list
+      if (list.length > this.checkUserList.length) {
+        for (var i = 0; i < list.length; i++) {
+          var isRepetition = 0
+          for (var j = 0; j < this.checkUserList.length; j++) {
+            if (list[i].id === this.checkUserList[j].id) {
+              isRepetition = 1
+            }
+          }
+          if (isRepetition === 0) {
+            this.checkUserList.push(list[i])
+          }
+        }
+      } else {
+        for (var i1 = 0; i1 < this.checkUserList.length; i1++) {
+          var isRepetition1 = 0
+          for (var j1 = 0; j1 < list.length; j1++) {
+            if (list[j1].id === this.checkUserList[i1].id) {
+              isRepetition1 = 1
+            }
+          }
+          if (isRepetition1 === 0) {
+            this.checkUserList.splice(i1, 1)
+          }
+        }
+      }
     },
     /**
      * @description 加载姓名列表
@@ -128,15 +152,14 @@ export default {
       const res = await this.$request.getMyUser({
         username: this.search
       })
-      // console.log('res', res)
       if (res.code === 0) {
         this.counts = []
         if (res.data.length > 0) {
-          // for (var i = 0; i < res.data.length; i++) {
-          //   this.counts.push(res.data[i].username)
-          // }
           this.counts = res.data
         }
+      }
+      if (this.search === '') {
+        this.users = this.counts
       }
       this.loading = false
     },
@@ -144,32 +167,34 @@ export default {
      * @description 添加按钮触发事件
      */
     submitForm () {
-      // let ids = []
-      // this.checkUserList.forEach(item => {
-      //   ids.push(item.id)
-      // })
       const checkUserList = JSON.parse(JSON.stringify(this.checkUserList))
-      this.$emit('update:choseUsers', checkUserList)
-      this.$emit('update:userIds', this.checkd)
-      this.$emit('onModal1')
-      this.search = ''
-      this.resetForm()
+      const obj = {
+        choseUsers: checkUserList,
+        userIds: this.checkd
+      }
+      this.$emit('onModal1', obj)
     },
     /**
      * @description 取消/关闭按钮触发事件
      */
     resetForm () {
-      // this.$refs["chose"].resetFields();
-      this.search = ''
       this.checkd = this.checkdInit
       this.checkUserList = this.choseUsers
-      this.$emit('update:isChoseUser', false)
+      this.closeUser()
     },
+    /**
+     * @description 隐藏模态框触发事件
+     */
+    closeUser () {
+      this.$emit('update:isChoseUser', false)
+      this.search = ''
+      this.getUserList()
+    },
+
     /**
      * @description 删除选中人员
      */
     delUser (index) {
-      // console.log("删除人员：", val);
       this.checkUserList.splice(index, 1)
       let ids = []
       this.checkUserList.forEach(item => {

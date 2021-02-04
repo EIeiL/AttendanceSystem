@@ -99,8 +99,7 @@ export const managerUser = {
       }, {
         label: '联系电话',
         value: '3'
-      }],
-      vValue: '1'
+      }]
     }, {
       prop: 'content',
       element: 'el-input',
