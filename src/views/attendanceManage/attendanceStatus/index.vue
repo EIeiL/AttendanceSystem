@@ -6,8 +6,8 @@
     <attendance-form
       :btn-items="'search,reset'"
       :form-options="formOptions"
-      @onSearch="onSearch"
       :btn-tools="btnTools"
+      @onSearch="onSearch"
       @toolsBtn="toolsBtn"
       @currPage="currPage"
     />
@@ -18,7 +18,6 @@
       :search-param="searchParam"
       :count="count"
       @onTableDel="onTableDel"
-      @onTableEdit="onTableEdit"
       @pageSize="pageSize"
       @currPage="currPage"
       v-loading="loading"
@@ -34,17 +33,16 @@
 </template>
 
 <script>
-// 通用组件 -- 当前位置、表单、表格+分页
+// 通用组件 -- 1当前位置、2表单、3表格+分页
 import Current from '@/components/NowLocation/index'
 import AttendanceForm from '@/components/QueryForm/index'
 import AttendanceTable from '@/components/DataTable/index'
 
-// 业务组件 -- 添加状态模态框
+// 业务组件 -- 1添加状态模态框
 import AddStatusModal from './components/addStatus'
 
-// js文件 -- 1传入组件内容、2深拷贝、3弹框
+// js文件 -- 1传入组件内容、2弹框
 import { attendanceStatus } from '@/enum/attendance'
-import deepCopy from '@/utils/deepCopy'
 import { openTip } from '@/utils/messageBox'
 
 export default {
@@ -74,20 +72,21 @@ export default {
     this.getStatusList(1)
   },
   methods: {
-    openTip, // 声明弹框事件
+    /**
+     * @description 声明弹框事件
+     */
+    openTip,
     /**
      * @description 触发搜索
      */
     onSearch (val) {
       this.searchParam.query = val.name
-      // console.log('搜索考勤状态', this.searchParam)
       this.getStatusList(1)
     },
     /**
      * @description 工具按钮返回内容
      */
     toolsBtn (val) {
-      // console.log('添加考勤状态', val)
       this.modalTitle = '添加状态'
       this.dialogVisible = true
     },
@@ -95,7 +94,6 @@ export default {
      * @description 模态框返回内容
      */
     async onModal (val) {
-      console.log('添加考勤状态模态框返回', val)
       const res = await this.$request.addStatus({
         name: val.value,
         rule: val.time
@@ -112,6 +110,7 @@ export default {
           type: 'info',
           message: res.msg
         })
+        this.$refs.addStatus.clickAction()
       }
     },
     /**
@@ -142,8 +141,7 @@ export default {
      */
     pageSize (val) {
       this.searchParam.pageSize = val
-      const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
-      this.getStatusList(currPage)
+      this.getStatusList(1)
     },
     /**
      * @description 跳转至某一页选择内容
@@ -155,14 +153,13 @@ export default {
     /**
      * @description 获取考勤状态数据
      */
-    async getStatusList (page) { // 获取数据列表
+    async getStatusList (page) {
       this.loading = true
       this.searchParam.currPage = page
       const res = await this.$request.getStatus({
         ...this.searchParam
       })
-      // console.log('获取考勤状态数据', res)
-      if (res.code === 0) {
+      if (res.code === 0 && res.data.total) {
         if (res.data.total > 0) {
           this.count = res.data.total
           this.tableData = res.data.list
@@ -172,23 +169,6 @@ export default {
         }
       }
       this.loading = false
-    },
-    /**
-     * @description 还没用
-     */
-    onTableEdit (val) {
-      // console.log('编辑', val)
-      // this.rowData = JSON.parse(val)
-      var o
-      if (typeof val === 'object') {
-        o = deepCopy.copyObject(val)
-      } else {
-        o = val
-      }
-      this.rowData = o
-      // console.log(this.rowData);
-      this.modalTitle = '编辑考勤状态'
-      this.dialogVisible = true
     }
   }
 }

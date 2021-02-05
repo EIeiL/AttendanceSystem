@@ -58,7 +58,7 @@ export const myAttendance = {
       rules: [
         { required: true, message: '请选择用户姓名', trigger: 'blur' }
       ],
-      options: [],
+      options: [{}],
       filterable: true
     },
     {

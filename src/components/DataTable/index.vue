@@ -50,6 +50,7 @@
         </template>
       </el-table-column>
     </el-table>
+
     <!-- 分页 -->
     <div class="block">
       <el-pagination
@@ -110,7 +111,7 @@ export default {
     }
   },
   data () {
-    return { }
+    return {}
   },
   methods: {
     /**
@@ -131,21 +132,16 @@ export default {
        * @description 选择每页多少条
        */
     handleSizeChange (val) {
-      // console.log(`每页 ${val} 条`);
       this.searchParam.pageSize = val
       this.loading = true
       this.$emit('pageSize', this.searchParam.pageSize)
-      // console.log('table',this.tableData);
-      // this.getListData(1)
     },
     /**
        * @description 输入页数跳转
        */
     handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
       this.loading = true
       this.$emit('currPage', val)
-      // this.getListData(val)
     },
     /**
        * @description 修改table header的背景色

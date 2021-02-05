@@ -81,7 +81,9 @@
       </span>
 
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">添 加</el-button>
+        <el-button type="primary" @click="submitForm" :loading="loading">{{
+          loading ? "提交中 ..." : "确 定"
+        }}</el-button>
         <el-button @click="resetForm">取 消</el-button>
       </span>
     </el-dialog>
@@ -129,6 +131,7 @@ export default {
         value: '',
         time: ''
       },
+      loading: false,
       rules: {
         // 校验规则
         value: [
@@ -145,15 +148,13 @@ export default {
     submitForm () {
       this.$refs['formItem'].validate((valid) => {
         if (valid) {
+          this.loading = true
           if (this.num === '迟到') {
             this.formItem.time = this.formItem.timeLate[0] + '-' + this.formItem.timeLate[1]
           }
           delete this.formItem.timeLate
           const form = JSON.parse(JSON.stringify(this.formItem))
-          console.log('form', form)
           this.$emit('onModal', form)
-          // this.resetForm()
-          // this.formItem = { value: '', time: '' }
         }
       })
     },
@@ -164,6 +165,13 @@ export default {
       this.num = ''
       await this.$refs['formItem'].resetFields()
       this.$emit('update:dialogVisible', false)
+      this.clickAction()
+    },
+    /**
+     * @description 停止转动
+     */
+    clickAction () {
+      this.loading = false
     },
     /**
      * @description 下拉框value值改变触发事件

@@ -46,7 +46,7 @@
           <el-form-item
             label="休息日选择："
             class="del-marginBottom"
-            prop="dayArray"
+            prop="dayArr"
           >
             <el-checkbox-group
               v-model="dayArr"
@@ -84,8 +84,8 @@
         </el-form>
         <div class="demo-drawer__footer">
           <el-button type="primary" @click="submitForm" :loading="loading">{{
-            loading ? "提交中 ..." : "添 加"
-          }}</el-button>
+          loading ? "提交中 ..." : "确 定"
+        }}</el-button>
           <!-- <el-button type="primary" @click="submitForm">添 加</el-button> -->
           <el-button @click="resetForm">取 消</el-button>
         </div>
@@ -140,7 +140,6 @@ export default {
   },
   data () {
     return {
-      // timer: null,
       loading: false,
       dayArr: [7], // 休息日
       rules: {// 校验规则
@@ -151,13 +150,7 @@ export default {
         ],
         type: [
           { required: true, message: '请选择考勤类型', trigger: 'blur' }
-        ],
-        dayArray: [
-          { required: false, trigger: 'blur' }
-        ],
-        time: [{ required: false, trigger: 'blur' }],
-        people: [{ required: false, trigger: 'blur' }],
-        setting: [{ required: false, trigger: 'blur' }]
+        ]
       },
       value: new Date(), // 日历相关
       dayTitle: '' // 上班or放假
@@ -184,14 +177,11 @@ export default {
           } else {
             this.$emit('onModal', true)
           }
-          // this.$emit('update:dialogVisible', false)
-          setTimeout(this.loading = false, 5000)
-        } else {
-          // this.$message({
-          //   type: 'info',
-          //   message: '校验失败'
-          // })
-          // return false
+        } else if (valid && this.dayArr.length === 0) {
+          this.$message({
+            type: 'info',
+            message: '请选择休息日'
+          })
         }
       })
     },
@@ -202,6 +192,7 @@ export default {
       this.$refs['rowData'].resetFields()
       this.$emit('update:dialogVisible', false)
       this.$emit('update:userIds', [])
+      this.clickAction()
     },
     /**
      * @description 休息日判断--日历选中
@@ -251,29 +242,10 @@ export default {
       this.$emit('update:isChoseUser', true)
     },
     /**
-     * 抽屉加入
+     * @description 停止转动
      */
-    handleClose (done) {
-      if (this.loading) {
-        return
-      }
-      this.$confirm('确定要提交表单吗？')
-        .then((_) => {
-          this.loading = true
-          this.timer = setTimeout(() => {
-            done()
-            // 动画关闭需要一定的时间
-            setTimeout(() => {
-              this.loading = false
-            }, 400)
-          }, 2000)
-        })
-        .catch((_) => { })
-    },
-    cancelForm () {
+    clickAction () {
       this.loading = false
-      this.dialog = false
-      clearTimeout(this.timer)
     }
   }
 }

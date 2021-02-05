@@ -20,25 +20,22 @@
               ref="upload"
               :limit="999"
               :action="doUpload"
-              :on-remove="handleRemove"
               :on-success="getRes"
               :file-list="fileList"
               :auto-upload="false"
               :on-change="changeBtn"
-              :show-file-list='false'
+              :show-file-list="false"
             >
-              <el-button slot="trigger" size="small"
-                >{{btnName}}</el-button
-              >
-              <div slot="tip" class="el-upload__tip">
-                只能上传xls文件
-              </div>
+              <el-button slot="trigger" size="small">{{ btnName }}</el-button>
+              <div slot="tip" class="el-upload__tip">只能上传xls文件</div>
             </el-upload>
           </el-form-item>
         </el-form>
       </span>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitUpload">添 加</el-button>
+        <el-button type="primary" @click="submitUpload" :loading="loading">{{
+          loading ? "提交中 ..." : "确 定"
+        }}</el-button>
         <el-button @click="resetForm">取 消</el-button>
       </span>
     </el-dialog>
@@ -58,6 +55,7 @@ export default {
   data () {
     return {
       doUpload: '/attendance/users/importUser', // 上传文件接口
+      loading: false,
       rules: { // 校验规则
         file: [
           { required: true, message: '请选择文件', trigger: 'blur' }
@@ -75,12 +73,19 @@ export default {
       this.fileList = []
       this.$emit('update:dialogVisible1', false)
       this.btnName = '选择文件'
+      this.clickAction()
+    },
+    /**
+     * @description 停止转动
+     */
+    clickAction () {
+      this.loading = false
     },
     /**
      * @description 是否在选取文件后立即进行上传
      */
     submitUpload () {
-      // console.log(this.$refs.upload.uploadFiles, 'this.$refs.upload')
+      this.loading = true
       const uploadFiles = this.$refs.upload.uploadFiles
       this.$refs.upload.uploadFiles = [uploadFiles[uploadFiles.length - 1]]
       this.$refs.upload.submit()
@@ -89,12 +94,11 @@ export default {
      * @description 文件列表移除文件时的钩子
      */
     handleRemove (file, fileList) {
-      // console.log(file, fileList)
       this.fileList = []
       this.btnName = '选择文件'
     },
     /**
-     * @description
+     * @description 文件状态改变时的钩子
      */
     changeBtn (file) {
       this.btnName = file.name
@@ -103,9 +107,6 @@ export default {
      * @description 文件上传成功时的钩子
      */
     getRes (response, file, fileList) {
-      // console.log('file', file)
-      // console.log('fileList', fileList)
-      // console.log('response', response)
       this.$emit('onModal1', response)
       this.btnName = '选择文件'
     }

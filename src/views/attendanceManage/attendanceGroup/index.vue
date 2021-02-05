@@ -6,7 +6,7 @@
     <attendance-form
       :btn-tools="btnTools"
       :btn-items="''"
-      :form-options="formOptions"
+      :form-options="[]"
       @toolsBtn="toolsBtn"
     />
     <!-- 表格+分页 -->
@@ -29,6 +29,7 @@
       :rowData="rowData"
       :isChoseUser.sync="isChoseUser"
       @onModal="onModal"
+      ref="addGroup"
     />
     <choseUser-modal
       :isChoseUser.sync="isChoseUser"
@@ -51,7 +52,7 @@ import AttendanceTable from '@/components/DataTable/index'
 import AddGroupModal from './components/addGroup'
 import ChoseUserModal from './components/choseUser'
 
-// js文件 -- 1传入组件内容、2深拷贝、3弹框
+// js文件 -- 1传入组件内容、2弹框
 import { attendanceGroup } from '@/enum/attendance'
 import { openTip } from '@/utils/messageBox'
 
@@ -70,7 +71,6 @@ export default {
       dialogVisible: false, // 控制新增+编辑模态框是否显示
       isChoseUser: false, // 控制选择人员模态框是否显示
       modalTitle: '', // 模态框标题
-      formOptions: [], // 表单属性
       btnTools: attendanceGroup.btnTools, // 工具按钮属性
       columnOptions: attendanceGroup.columnOptions, // 列属性
       tableData: [], // 页面显示数据 -- 表格
@@ -87,13 +87,16 @@ export default {
     this.getGroupList(1)
   },
   methods: {
-    openTip, // 声明弹框事件
+    /**
+     * @description 声明弹框事件
+     */
+    openTip,
     /**
      * @description 工具按钮返回内容
      */
     toolsBtn (val) {
       this.modalTitle = '添加考勤组'
-      this.rowData = {users: [], type: 1}
+      this.rowData = { users: [], type: 1, dayoff: '7' }
       this.dialogVisible = true
     },
     /**
@@ -125,12 +128,16 @@ export default {
         })
         this.rowData = {}
         this.userIds = []
+        this.$refs.addGroup.resetForm()
         this.getGroupList(1)
       } else if (res.code === -1) {
         this.$message({
           type: 'info',
           message: res.msg
         })
+        this.$refs.addGroup.clickAction()
+      } else {
+        this.$refs.addGroup.clickAction()
       }
     },
     /**
@@ -163,6 +170,11 @@ export default {
       } else if (res.code === 0 && res.data.userList.length === 0) {
         this.userIds = val.userIds
         this.$refs.choseUser.closeUser()
+      } else if (res.code === -1) {
+        this.$message({
+          type: 'info',
+          message: res.msg
+        })
       }
     },
     /**
@@ -226,7 +238,7 @@ export default {
       const res = await this.$request.getGroup({
         ...this.searchParam
       })
-      if (res.code === 0) {
+      if (res.code === 0 && res.data.list && res.data.total) {
         const tableDataTemp = []
         for (var i = 0; i < res.data.list.length; i++) {
           const obj = {

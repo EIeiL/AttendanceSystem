@@ -25,7 +25,9 @@
         </span>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+        <el-button type="primary" @click="submitForm" :loading="loading">{{
+          loading ? "提交中 ..." : "确 定"
+        }}</el-button>
         <el-button @click="resetForm">取 消</el-button>
       </span>
     </el-dialog>
@@ -87,12 +89,8 @@ export default {
       this.loading = true
       this.$refs['formInline'].validate((valid) => {
         if (valid) {
-          console.log('校验成功！')
           this.$emit('onModal', this.formInline)
-          this.loading = false
-          // this.resetForm()
         } else {
-          console.log('校验失败！')
           this.loading = false
         }
       })
@@ -101,8 +99,15 @@ export default {
      * @description 取消/关闭按钮触发事件
      */
     resetForm () {
-      this.$refs['formInline'].resetFields()
       this.$emit('update:dialogVisible', false)
+      this.$refs['formInline'].resetFields()
+      this.clickAction()
+    },
+    /**
+     * @description 停止转动
+     */
+    clickAction () {
+      this.loading = false
     }
   }
 }

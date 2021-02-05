@@ -27,18 +27,19 @@
       :msgOptions="msgOptions"
       :modalTitle="modalTitle"
       @onModal="onModal"
+      ref="add"
     />
   </div>
 </template>
 
 <script>
-// 通用组件 -- 当前位置、表单、表格+分页、添加模态框
+// 通用组件 -- 1当前位置、2表单、3表格+分页、4添加模态框
 import Current from '@/components/NowLocation/index'
 import AttendanceForm from '@/components/QueryForm/index'
 import AttendanceTable from '@/components/DataTable/index'
 import AddModal from '@/components/ModalBox/addModal/index'
 
-// js文件 -- 传入组件内容、日期格式化
+// js文件 -- 1传入组件内容、2日期格式化
 import { myAttendance } from '@/enum/attendance'
 import formatDate from '@/utils/formatDate'
 
@@ -110,19 +111,19 @@ export default {
       const res = await this.$request.addMyattendance({
         ...val
       })
-      // console.log('res', res)
       if (res.code === 0) {
         this.$message({
           type: 'sucess',
           message: '添加成功!'
         })
-        this.dialogVisible = false
+        this.$refs.add.resetForm()
         this.getAttendanceList(1)
       } else if (res.code === -1) {
         this.$message({
-          type: 'sucess',
+          type: 'info',
           message: res.msg
         })
+        this.$refs.add.clickAction()
       }
     },
     /**
@@ -130,8 +131,7 @@ export default {
      */
     pageSize (val) {
       this.searchParam.pageSize = val
-      const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
-      this.getAttendanceList(currPage)
+      this.getAttendanceList(1)
     },
     /**
      * @description 跳转至某一页选择内容
@@ -146,8 +146,7 @@ export default {
     async getUserList () {
       const res = await this.$request.getMyUser({
       })
-      // console.log('用户res', res)
-      if (res.code === 0) {
+      if (res.code === 0 && res.data) {
         for (var i = 0; i < res.data.length; i++) {
           const user = {
             label: res.data[i].username,
@@ -163,9 +162,7 @@ export default {
     async getStatusList () {
       const res = await this.$request.getStatus({
       })
-      // console.log('状态res', res)
-      if (res.code === 0) {
-        // console.log('打印状态信息', res.data.list)
+      if (res.code === 0 && res.data.list) {
         for (var i = 0; i < res.data.list.length; i++) {
           const status = {
             label: res.data.list[i].name,
@@ -184,8 +181,7 @@ export default {
       const res = await this.$request.getMyattendance({
         ...this.searchParam
       })
-      // console.log('考勤res', res)
-      if (res.code === 0) {
+      if (res.code === 0 && res.data.list && res.data.total) {
         const tableDataTemp = []
         for (var i = 0; i < res.data.list.length; i++) {
           const obj = {
@@ -219,8 +215,5 @@ export default {
 >>> .el-dialog__body {
   // 我的考勤
   padding-bottom: 0px;
-}
->>> .del-nowDate .el-picker__footer .el-button--text {
-  display: none;
 }
 </style>

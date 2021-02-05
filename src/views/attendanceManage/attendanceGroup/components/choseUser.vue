@@ -110,31 +110,51 @@ export default {
       const list = this.users.filter(item => {
         return val.includes(item.id)
       })
-      if (list.length > this.checkUserList.length) {
-        for (var i = 0; i < list.length; i++) {
-          var isRepetition = 0
-          for (var j = 0; j < this.checkUserList.length; j++) {
-            if (list[i].id === this.checkUserList[j].id) {
-              isRepetition = 1
-            }
-          }
-          if (isRepetition === 0) {
-            this.checkUserList.push(list[i])
+
+      const arr1 = list.length > this.checkUserList.length ? list : this.checkUserList
+      const arr2 = list.length > this.checkUserList.length ? this.checkUserList : list
+
+      for (var i = 0; i < arr1.length; i++) {
+        var isRepetition = 0
+        for (var j = 0; j < arr2.length; j++) {
+          if (arr1[i].id === arr2[j].id) {
+            isRepetition = 1
           }
         }
-      } else {
-        for (var i1 = 0; i1 < this.checkUserList.length; i1++) {
-          var isRepetition1 = 0
-          for (var j1 = 0; j1 < list.length; j1++) {
-            if (list[j1].id === this.checkUserList[i1].id) {
-              isRepetition1 = 1
-            }
-          }
-          if (isRepetition1 === 0) {
-            this.checkUserList.splice(i1, 1)
+        if (isRepetition === 0) {
+          if (list.length > this.checkUserList.length) {
+            this.checkUserList.push(list[i])
+          } else {
+            this.checkUserList.splice(i, 1)
           }
         }
       }
+
+      // if (list.length > this.checkUserList.length) {
+      //   for (var i = 0; i < list.length; i++) {
+      //     var isRepetition = 0
+      //     for (var j = 0; j < this.checkUserList.length; j++) {
+      //       if (list[i].id === this.checkUserList[j].id) {
+      //         isRepetition = 1
+      //       }
+      //     }
+      //     if (isRepetition === 0) {
+      //       this.checkUserList.push(list[i])
+      //     }
+      //   }
+      // } else {
+      //   for (var i1 = 0; i1 < this.checkUserList.length; i1++) {
+      //     var isRepetition1 = 0
+      //     for (var j1 = 0; j1 < list.length; j1++) {
+      //       if (list[j1].id === this.checkUserList[i1].id) {
+      //         isRepetition1 = 1
+      //       }
+      //     }
+      //     if (isRepetition1 === 0) {
+      //       this.checkUserList.splice(i1, 1)
+      //     }
+      //   }
+      // }
     },
     /**
      * @description 加载姓名列表

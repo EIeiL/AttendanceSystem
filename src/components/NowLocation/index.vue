@@ -6,16 +6,14 @@
 
 <script>
 export default {
-
 }
 
 </script>
 
 <style lang="scss" scoped>
-  .current {
-    border-bottom: 1px solid grey;
-    padding: 15px;
-    padding-bottom: 10px;
-  }
-
+.current {
+  border-bottom: 1px solid grey;
+  padding: 15px;
+  padding-bottom: 10px;
+}
 </style>

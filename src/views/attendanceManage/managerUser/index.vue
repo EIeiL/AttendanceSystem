@@ -6,8 +6,8 @@
     <attendance-form
       :btn-items="'search,reset'"
       :form-options="formOptions"
-      @onSearch="onSearch"
       :btn-tools="btnTools"
+      @onSearch="onSearch"
       @toolsBtn="toolsBtn"
       @currPage="currPage"
     />
@@ -30,27 +30,28 @@
       :modalTitle="modalTitle"
       :rowData="rowData"
       @onModal="onModal"
+      ref="add"
     />
     <importUser-modal
       :dialogVisible1.sync="dialogVisible1"
       @onModal1="onModal1"
+      ref="importUser"
     />
   </div>
 </template>
 
 <script>
-// 通用组件 -- 当前位置、表单、表格+分页、添加模态框
+// 通用组件 -- 1当前位置、2表单、3表格+分页、4添加模态框
 import Current from '@/components/NowLocation/index'
 import AttendanceForm from '@/components/QueryForm/index'
 import AttendanceTable from '@/components/DataTable/index'
 import AddModal from '@/components/ModalBox/addModal/index'
 
-// 业务组件 -- 导入用户模态框
+// 业务组件 -- 1导入用户模态框
 import ImportUserModal from './components/importUser'
 
-// js文件 -- 1传入组件内容、2深拷贝、3弹框
+// js文件 -- 1传入组件内容、2弹框
 import { managerUser } from '@/enum/attendance'
-import deepCopy from '@/utils/deepCopy'
 import { openTip } from '@/utils/messageBox'
 
 export default {
@@ -84,7 +85,10 @@ export default {
     this.getUserList(1)
   },
   methods: {
-    openTip, // 声明弹框事件
+    /**
+     * @description 声明弹框事件
+     */
+    openTip,
     /**
      * @description 触发搜索
      */
@@ -106,19 +110,17 @@ export default {
           ...this.searchParam,
           telephone: val.content
         })
-      } else if (val.content) {
+      } else if (val.content) { // 输入框有内容但未选择类型
         this.$message({
           type: 'info',
           message: '请选择匹配字段'
         })
-      } else {
+      } else { // 输入框无内容
         res = await this.$request.getUser({
           ...this.searchParam
         })
       }
-      // console.log('搜索res', res)
-      if (res !== '' && res.code === 0) {
-        // console.log('搜索用户success')
+      if (res !== '' && res.code === 0 && res.data.total) {
         if (res.data.total > 0) {
           this.count = res.data.total
           this.tableData = res.data.list
@@ -141,6 +143,82 @@ export default {
         this.dialogVisible1 = true
       }
     },
+    /**
+     * @description 添加用户模态框返回内容
+     */
+    async onModal (val) {
+      if (this.modalTitle === '编辑用户') {
+        const res = await this.$request.editUser({
+          id: val.id,
+          telephone: val.telephone,
+          username: val.username
+        })
+        if (res.code === 0) {
+          this.$message({
+            type: 'info',
+            message: '编辑成功!'
+          })
+          this.$refs.add.resetForm()
+          this.getUserList(1)
+        } else {
+          this.$message({
+            type: 'info',
+            message: res.msg
+          })
+          this.$refs.add.clickAction()
+        }
+      } else {
+        const res = await this.$request.addUser({
+          ...val
+        })
+        if (res.code === 0) {
+          this.$message({
+            type: 'success',
+            message: '添加成功!'
+          })
+          this.$refs.add.resetForm()
+          this.getUserList(1)
+        } else {
+          this.$message({
+            type: 'info',
+            message: '该姓名已存在，请修改'
+          })
+          this.$refs.add.clickAction()
+        }
+      }
+    },
+    /**
+     * @description 导入用户模态框返回内容
+     */
+    onModal1 (val) {
+      if (val.code && val.code === 0) {
+        var successCount = 0
+        var errorCount = 0
+        if (val.data) {
+          successCount = val.data.successCount
+          errorCount = val.data.errorCount
+        }
+        this.$message({
+          type: 'info',
+          message: '导入成功' + successCount + '条，导入失败' + errorCount + '条'
+        })
+        this.$refs.importUser.resetForm()
+        this.getUserList(1)
+      } else if (val.code && val.code === -1) {
+        this.$message({
+          type: 'info',
+          message: val.msg
+        })
+        this.$refs.importUser.clickAction()
+      } else {
+        this.$message({
+          type: 'warning',
+          message: '导入失败'
+        })
+        this.$refs.importUser.clickAction()
+      }
+    },
+
     /**
      * @description 删除某行数据
      */
@@ -168,97 +246,24 @@ export default {
      * @description 编辑某行数据
      */
     onTableEdit (val) {
-      var o
-      if (typeof val === 'object') {
-        o = deepCopy.copyObject(val)
-      } else {
-        o = val
-      }
-      this.rowData = o
+      // var o
+      // if (typeof val === 'object') {
+      //   o = deepCopy.copyObject(val)
+      // } else {
+      //   o = val
+      // }
+      const obj = JSON.parse(JSON.stringify(val))
+      this.rowData = obj
       this.modalTitle = '编辑用户'
       this.dialogVisible = true
     },
-    /**
-     * @description 添加用户模态框返回内容
-     */
-    async onModal (val) {
-      if (this.modalTitle === '编辑用户') {
-        // console.log('编辑val', val)
-        const res = await this.$request.editUser({
-          id: val.id,
-          telephone: val.telephone,
-          username: val.username
-        })
-        // console.log('编辑res', res)
-        if (res.code === 0) {
-          // this.getAttendanceList(1)
-          // console.log('编辑success')
-          this.$message({
-            type: 'info',
-            message: '编辑成功'
-          })
-          this.dialogVisible = false
-          this.getUserList(1)
-        } else {
-          this.$message({
-            type: 'info',
-            message: res.msg
-          })
-        }
-      } else {
-        const res = await this.$request.addUser({
-          ...val
-        })
-        // console.log('添加res', res)
-        if (res.code === 0) {
-          // console.log('添加success')
-          this.$message({
-            type: 'success',
-            message: '添加成功'
-          })
-          this.dialogVisible = false
-          this.getUserList(1)
-        } else {
-          this.$message({
-            type: 'info',
-            message: '该姓名已存在，请修改'
-          })
-        }
-      }
-    },
-    /**
-     * @description 导入用户模态框返回内容
-     */
-    onModal1 (val) {
-      // console.log('导入用户', val)
-      // setTimeout(this.getUserList(1), 500)
-      if (val.code === 0) {
-        var successCount = 0
-        var errorCount = 0
-        if (val.data) {
-          successCount = val.data.successCount
-          errorCount = val.data.errorCount
-        }
-        this.$message({
-          type: 'info',
-          message: '导入成功' + successCount + '条，导入失败' + errorCount + '条'
-        })
-        this.dialogVisible1 = false
-        this.getUserList(1)
-      } else if (val.code === -1) {
-        this.$message({
-          type: 'info',
-          message: val.msg
-        })
-      }
-    },
+
     /**
      * @description 选择每页数据条数返回内容
      */
     pageSize (val) {
       this.searchParam.pageSize = val
-      const currPage = parseInt(this.count / this.searchParam.pageSize) + 1
-      this.getUserList(currPage)
+      this.getUserList(1)
     },
     /**
      * @description 跳转至某一页选择内容
@@ -276,8 +281,7 @@ export default {
       const res = await this.$request.getUser({
         ...this.searchParam
       })
-      // console.log('获取用户数据', res)
-      if (res.code === 0 && res.data.list && res.data.total) {
+      if (res.code === 0 && res.data.total) {
         if (res.data.total > 0) {
           this.count = res.data.total
           this.tableData = res.data.list
